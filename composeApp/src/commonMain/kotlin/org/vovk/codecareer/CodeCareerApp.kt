@@ -49,14 +49,14 @@ fun MainScreenWrapper() {
 
 @Composable
 fun JobSearchScreen() {
-    val (isFilterOverlayVisible, setFilterOverlayVisible) = remember { mutableStateOf(false) }
-
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
+        val (isFilterOverlayVisible, setFilterOverlayVisible) = remember { mutableStateOf(false) }
         val screenWidth = maxWidth
+
         if (screenWidth >= 1024.dp) {
             Row(
                 modifier = Modifier
@@ -64,20 +64,7 @@ fun JobSearchScreen() {
                     .background(Color.White),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .weight(3f)
-                ) {
-                    Text(
-                        text = "Вакансії: к-сть вакансій",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    JobsPage()
-                }
-
-                // Sidebar Filters
+                JobsPage(0.7f)
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -95,20 +82,7 @@ fun JobSearchScreen() {
                     .fillMaxSize()
                     .background(Color.White)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = "Вакансії: к-сть вакансій",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    JobsPage()
-                }
-
+                JobsPage(1f)
                 // "Filters" button at the bottom
                 Button(
                     onClick = { setFilterOverlayVisible(!isFilterOverlayVisible) },

@@ -17,10 +17,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun JobsPage(){
-    LazyColumn {
-        items(5) { index ->
-            JobCard()
+fun JobsPage(windowSize: Float = 0.7f) {
+    Column(
+        modifier = Modifier.fillMaxWidth(windowSize),
+    ) {
+        Text(
+            text = "Вакансії: к-сть вакансій",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        LazyColumn {
+            items(5) { index ->
+                JobCard()
+            }
         }
     }
 }
