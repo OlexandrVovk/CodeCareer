@@ -1,16 +1,8 @@
 package org.vovk.codecareer
 
-import CircleShapeIcon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.Slider
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,44 +16,61 @@ import org.vovk.codecareer.ui.sidebar.ProfileSection
 
 @Composable
 fun App(){
-    JobSearchScreen()
+    MainScreenWrapper()
+}
+
+@Composable
+fun MainScreenWrapper() {
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        val screenWidth = maxWidth
+        val isCompactScreen = screenWidth < 1024.dp
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (isCompactScreen) Color.White else Color.DarkGray),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(1024.dp)
+                    .fillMaxHeight()
+                    .background(Color.White)
+            ) {
+                JobSearchScreen()
+            }
+        }
+    }
 }
 
 @Composable
 fun JobSearchScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.LightGray),
-        contentAlignment = Alignment.Center
+    Row(modifier = Modifier
+        .fillMaxWidth(0.8f)
+        .background(Color.White),
     ) {
-        Row(modifier = Modifier
-            .fillMaxWidth(0.8f)
-            .background(Color.White),
-            ) {
-            Column(modifier = Modifier
-                .weight(3f)
+        Column(modifier = Modifier
+            .weight(3f)
+            .padding(16.dp)
+        ) {
+            Text(
+                text = "Вакансії: к-сть вакансій",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            JobsPage()
+        }
+        // Sidebar Filters
+        Column(
+            modifier = Modifier
+                .weight(1f)
                 .padding(16.dp)
-            ) {
-                Text(
-                    text = "Вакансії: к-сть вакансій",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                JobsPage()
-            }
-            // Sidebar Filters
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(16.dp)
-                    .background(Color.Gray.copy(alpha = 0.2f))
-            ) {
-                ProfileSection()
-                FilterSection()
-            }
+                .background(Color.Gray.copy(alpha = 0.2f))
+        ) {
+            ProfileSection()
+            FilterSection()
         }
     }
-
 }
