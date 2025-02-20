@@ -8,7 +8,9 @@
 
     <script>
         let enTranslations = {};
-        function getJsonData() {
+        let ukTranslations = {};
+
+        function getEnJsonData() {
             return JSON.stringify(enTranslations);
         }
         function loadEnLanguage() {
@@ -20,6 +22,19 @@
                 })
                 .catch(error => console.error(`Error loading lang/en.json:`, error));
         }
+        function getUkJsonData() {
+            return JSON.stringify(ukTranslations);
+        }
+        function loadUkLanguage() {
+            return fetch(`lang/uk.json`)
+                .then(response => response.json())
+                .then(data => {
+                    ukTranslations = data;
+                    console.log(`Loaded language: uk`, ukTranslations);
+                })
+                .catch(error => console.error(`Error loading lang/uk.json:`, error));
+        }
+
     </script>
     <script type="application/javascript" src="composeApp.js"></script>
 </head>

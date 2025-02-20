@@ -7,8 +7,11 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
 
-external fun getJsonData(): String
+external fun getEnJsonData(): String
 external fun loadEnLanguage(): String
+
+external fun getUkJsonData(): String
+external fun loadUkLanguage(): String
 
 object Strings {
     var currentLanguage by mutableStateOf("en")
@@ -22,18 +25,19 @@ object Strings {
 
     fun loadLanguage(language: String) {
         currentLanguage = language
-        loadEnLanguage()
-        translations = try {
-            val test = Json.parseToJsonElement(getJsonData()).jsonObject
-            println(test.toString())
-            test
-        } catch (e: Exception) {
-            //console.error("Error parsing JSON for $language: ${e.message}")
-            null
+        when (language) {
+            "en" -> {
+                loadEnLanguage()
+                translations = Json.parseToJsonElement(getEnJsonData()).jsonObject
+            }
+            "uk" -> {
+                loadUkLanguage()
+                translations = Json.parseToJsonElement(getUkJsonData()).jsonObject
+            }
         }
     }
 
-    fun getString(key: String): String {
+    private fun getString(key: String): String {
         return (translations?.get(key) as? JsonPrimitive)?.content ?: key
     }
 
