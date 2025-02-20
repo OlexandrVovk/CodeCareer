@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.taktyka.c2.dal.utils.multiLangSupport.Strings
 
 @Composable
 fun JobsPage(windowSize: Float = 0.7f) {
@@ -47,7 +48,7 @@ fun JobCard() {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CircleShapeIcon()
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("ФІРМА", fontWeight = FontWeight.Bold)
+                Text(Strings.text("test_one"), fontWeight = FontWeight.Bold)
             }
             Text("НАЗВА ВАКАНСІЇ", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
             Text("теги теги теги", fontSize = 14.sp, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
