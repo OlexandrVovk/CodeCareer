@@ -1,6 +1,10 @@
 package com.my.jobsearcher.view.controllers;
 
 import com.my.jobsearcher.store.dto.ResponseDto;
+import com.my.jobsearcher.store.entities.VacancyRequest;
+import com.my.jobsearcher.store.enums.Employment;
+import com.my.jobsearcher.store.enums.Experience;
+import com.my.jobsearcher.store.enums.Language;
 import com.my.jobsearcher.view.services.MainService;
 
 import lombok.AllArgsConstructor;
@@ -20,11 +24,17 @@ public class MainController {
     @SneakyThrows
     @GetMapping("")
     public List<ResponseDto> getVacancies(@RequestParam("language") String lan,
-                                  @RequestParam(value = "level", required = false) String lvl,
-                                  @RequestParam("employment") String emp){
-        if (lvl == null) lvl = "";
-        //todo: write something on empty screen
-        return service.getVacancies(lan, lvl.trim(), emp.trim());
+                                  @RequestParam(value = "exp", required = false) String exp,
+                                  @RequestParam(value = "employment", required = false) String emp){
+        if (exp == null) exp = "ALL";
+        if (emp == null) emp = "BOTH";
+        VacancyRequest vacancyRequest = VacancyRequest.builder()
+                .lang(Language.valueOf(lan.toUpperCase()))
+                .exp(Experience.valueOf(exp.toUpperCase()))
+                .emp(Employment.valueOf(emp.toUpperCase()))
+                .build();
+
+        return service.getVacancies(vacancyRequest);
     }
 
 }

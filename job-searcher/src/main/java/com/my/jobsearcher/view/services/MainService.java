@@ -1,6 +1,7 @@
 package com.my.jobsearcher.view.services;
 
 import com.my.jobsearcher.store.dto.ResponseDto;
+import com.my.jobsearcher.store.entities.VacancyRequest;
 import com.my.jobsearcher.view.services.parsers.impl.DjinniParser;
 import com.my.jobsearcher.view.services.parsers.impl.DouParser;
 import com.my.jobsearcher.view.services.parsers.impl.WorkUaParser;
@@ -18,14 +19,16 @@ public class MainService {
     private final DouParser douParser;
     private final WorkUaParser workUaParser;
 
-    public List<ResponseDto> getVacancies(String lan, String lvl, String emp){
+    public List<ResponseDto> getVacancies(VacancyRequest vacancyRequest) {
         List<ResponseDto> resultList = new ArrayList<>();
-        List<ResponseDto> djinniParserVacancies = djinniParser.getVacancies(lan, lvl, emp);
-        List<ResponseDto> douParserVacancies = douParser.getVacancies(lan, lvl, emp);
-        List<ResponseDto> workUaParserVacancies = workUaParser.getVacancies(lan, lvl, emp);
+
+        List<ResponseDto> djinniParserVacancies = djinniParser.getVacancies(vacancyRequest);
+        List<ResponseDto> douParserVacancies = douParser.getVacancies(vacancyRequest);
+        //List<ResponseDto> workUaParserVacancies = workUaParser.getVacancies(vacancyRequest);
+
         resultList.addAll(djinniParserVacancies);
         resultList.addAll(douParserVacancies);
-        resultList.addAll(workUaParserVacancies);
+        //resultList.addAll(workUaParserVacancies);
         return resultList;
     }
 }

@@ -1,9 +1,13 @@
 package com.my.jobsearcher.view.services.parsers.impl;
 
 import com.my.jobsearcher.store.dto.ResponseDto;
+import com.my.jobsearcher.store.entities.VacancyRequest;
+import com.my.jobsearcher.store.enums.Employment;
+import com.my.jobsearcher.store.enums.Experience;
 import com.my.jobsearcher.view.services.parsers.Parser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -12,75 +16,83 @@ import java.util.List;
 
 @Component
 public class DouParser implements Parser {
+
     private final String JUNIOR = "exp=0-1";
     private final String MIDDLE = "exp=1-3";
     private final String SENIOR = "exp=3-5";
     private final String SENIOR_PLUS = "exp=5plus";
 
-    public List<ResponseDto> getVacancies(String lan, String lvl, String emp){
-        List<ResponseDto> resultList = null;
-        String expLvl = (lvl.equals("junior")) ? JUNIOR :
-                ((lvl.equals("middle")) ? MIDDLE :
-                        (lvl.equals("senior") ? SENIOR : ""));
-        String url = "https://jobs.dou.ua/vacancies/?"
-                + "search="
-                + lan
-                + '&'
-                + expLvl;
-        int i = 0;
-        while(i < 2){
-            try {
-                Document document = Jsoup.connect(url).get();
-                resultList = buildDto(document, emp);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            if (lvl.equals("senior")){
-                expLvl = SENIOR_PLUS;
-                i++;
-                url = "https://jobs.dou.ua/vacancies/?"
-                        + "category="
-                        + lan
-                        + '&'
-                        + expLvl;
-            }else {
-                i += 2;
-            }
+    @Override
+    public List<ResponseDto> getVacancies(VacancyRequest vacancyRequest) {
+        List<ResponseDto> resultList = new ArrayList<>();
+
+        String expLvl;
+        if (vacancyRequest.getExp() == Experience.JUNIOR) {
+            expLvl = JUNIOR;
+        } else if (vacancyRequest.getExp() == Experience.MIDDLE) {
+            expLvl = MIDDLE;
+        } else if (vacancyRequest.getExp() == Experience.SENIOR) {
+            expLvl = SENIOR;
+        } else {
+            expLvl = "";
+        }
+
+        String url = "https://jobs.dou.ua/vacancies/?search="
+                + vacancyRequest.getLang().toString().toLowerCase()
+                + "&" + expLvl;
+        try {
+            Document document = Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                            "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                            "Chrome/110.0.0.0 Safari/537.36")
+                    .get();
+
+            resultList = buildDto(document, vacancyRequest.getEmp());
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to fetch DOU page: " + e.getMessage(), e);
         }
         return resultList;
     }
 
-    private List<ResponseDto> buildDto(Document document, String emp){
-        List<ResponseDto> list = new ArrayList<>();
-        List<String> urls = new ArrayList<>();
-        List<String> jobsTitles = new ArrayList<>();
-        List<String> companies = new ArrayList<>();
-        List<String> employment = new ArrayList<>();
-        var elements = document.select("a.vt");
-        elements.stream().forEach(x -> x.attributes().forEach( a -> {
-            if (!a.getValue().equals("vt")){
-                urls.add(a.getValue());
-            }
-        }));
-        elements.stream().forEach(x -> jobsTitles.add(x.text()));
-        elements = document.select("a.company");
-        elements.stream().forEach(x -> companies.add(x.text()));
-        document.select("span.cities.bi.bi-geo-alt-fill").stream().forEach(x -> {
-            employment.add(x.text());
-        });
+    private List<ResponseDto> buildDto(Document document, Employment emp) {
+        List<ResponseDto> vacancies = new ArrayList<>();
 
-        for (int i = 0; i < urls.size(); i++) {
-            if ((employment.get(i).equals("віддалено") && emp.equals("remote")) ||
-                    (employment.get(i).contains("віддалено") && !employment.get(i).equals("віддалено") && emp.equals("both")) ||
-                    ( !employment.get(i).contains("віддалено") && emp.equals("office"))
-            ) {
-                list.add(ResponseDto.builder()
-                        .jobTitle(jobsTitles.get(i))
-                        .company(companies.get(i))
-                        .url(urls.get(i))
+        var jobElements = document.select("li.l-vacancy");
+        for (Element jobElem : jobElements) {
+            Element linkEl = jobElem.selectFirst("a.vt");
+            if (linkEl == null) {
+                continue;
+            }
+            String jobUrl = linkEl.attr("href");
+            String jobTitle = linkEl.text();
+
+            Element companyEl = jobElem.selectFirst("a.company");
+            String companyName = (companyEl != null) ? companyEl.text() : "";
+
+            Element cityEl = jobElem.selectFirst("span.cities");
+            String cityText = (cityEl != null) ? cityEl.text() : "";
+
+            if (shouldIncludeVacancy(cityText, emp)) {
+                vacancies.add(ResponseDto.builder()
+                        .jobTitle(jobTitle)
+                        .company(companyName)
+                        .url(jobUrl)
                         .build());
             }
         }
-        return list;
+
+        return vacancies;
+    }
+
+    /**
+     * Simple helper to decide if a vacancy's city text matches your required Employment.
+     */
+    private boolean shouldIncludeVacancy(String cityText, Employment emp) {
+        return switch (emp) {
+            case REMOTE -> cityText.toLowerCase().contains("віддалено");
+            case OFFICE -> !cityText.toLowerCase().contains("віддалено");
+            default -> true;
+        };
     }
 }

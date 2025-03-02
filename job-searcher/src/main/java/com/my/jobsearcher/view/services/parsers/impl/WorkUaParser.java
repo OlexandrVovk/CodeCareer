@@ -1,6 +1,7 @@
 package com.my.jobsearcher.view.services.parsers.impl;
 
 import com.my.jobsearcher.store.dto.ResponseDto;
+import com.my.jobsearcher.store.entities.VacancyRequest;
 import com.my.jobsearcher.view.services.parsers.Parser;
 import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
@@ -18,14 +19,17 @@ public class WorkUaParser implements Parser {
     private final String WORK_UA_URL = "https://www.work.ua/jobs";
 
 
-    public List<ResponseDto> getVacancies(String lan, String lvl, String emp) {
+    public List<ResponseDto> getVacancies(VacancyRequest vacancyRequest) {
         List<ResponseDto> resultList;
         StringBuilder sb = new StringBuilder();
         sb.append(WORK_UA_URL);
-        sb.append('-' + lan.toLowerCase() + '/');
+        sb.append('-' + vacancyRequest.getLang().toString().toLowerCase() + '/');
         try {
             Document document = Jsoup.connect(sb.toString()).get();
-            resultList = buildDto(document, lvl, emp, lan);
+            resultList = buildDto(document,
+                    vacancyRequest.getExp().toString(),
+                    vacancyRequest.getEmp().toString(),
+                    vacancyRequest.getLang().toString());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
