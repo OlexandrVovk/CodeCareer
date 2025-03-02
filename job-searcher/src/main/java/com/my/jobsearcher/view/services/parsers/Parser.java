@@ -6,10 +6,5 @@ import org.jsoup.nodes.Document;
 import java.util.List;
 
 public interface Parser {
-
-
-
     public List<ResponseDto> getVacancies(String lan, String lvl, String emp);
-
-
 }

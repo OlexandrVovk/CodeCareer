@@ -20,12 +20,12 @@ public class MainService {
 
     public List<ResponseDto> getVacancies(String lan, String lvl, String emp){
         List<ResponseDto> resultList = new ArrayList<>();
-        List dtos1 = djinniParser.getVacancies(lan, lvl, emp);
-        List dtos2 = douParser.getVacancies(lan, lvl, emp);
-        List dtos3 = workUaParser.getVacancies(lan, lvl, emp);
-        resultList.addAll(dtos1);
-        resultList.addAll(dtos2);
-        resultList.addAll(dtos3);
+        List<ResponseDto> djinniParserVacancies = djinniParser.getVacancies(lan, lvl, emp);
+        List<ResponseDto> douParserVacancies = douParser.getVacancies(lan, lvl, emp);
+        List<ResponseDto> workUaParserVacancies = workUaParser.getVacancies(lan, lvl, emp);
+        resultList.addAll(djinniParserVacancies);
+        resultList.addAll(douParserVacancies);
+        resultList.addAll(workUaParserVacancies);
         return resultList;
     }
 }
