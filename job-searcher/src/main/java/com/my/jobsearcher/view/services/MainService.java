@@ -4,7 +4,7 @@ import com.my.jobsearcher.store.dto.ResponseDto;
 import com.my.jobsearcher.store.entities.VacancyRequest;
 import com.my.jobsearcher.view.services.parsers.impl.DjinniParser;
 import com.my.jobsearcher.view.services.parsers.impl.DouParser;
-import com.my.jobsearcher.view.services.parsers.impl.WorkUaParser;
+import com.my.jobsearcher.view.services.parsers.impl.GlassdoorParser;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +17,19 @@ public class MainService {
 
     private final DjinniParser djinniParser;
     private final DouParser douParser;
-    private final WorkUaParser workUaParser;
+    private final GlassdoorParser glassdoorParser;
 
     public List<ResponseDto> getVacancies(VacancyRequest vacancyRequest) {
         List<ResponseDto> resultList = new ArrayList<>();
 
         List<ResponseDto> djinniParserVacancies = djinniParser.getVacancies(vacancyRequest);
         List<ResponseDto> douParserVacancies = douParser.getVacancies(vacancyRequest);
+        List<ResponseDto> glassdoorVacancies = glassdoorParser.getVacancies(vacancyRequest);
         //List<ResponseDto> workUaParserVacancies = workUaParser.getVacancies(vacancyRequest);
 
         resultList.addAll(djinniParserVacancies);
         resultList.addAll(douParserVacancies);
-        //resultList.addAll(workUaParserVacancies);
+        resultList.addAll(glassdoorVacancies);
         return resultList;
     }
 }

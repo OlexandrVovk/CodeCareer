@@ -43,7 +43,6 @@ public class DjinniParser implements Parser {
                 + "&" + expLvl
                 + "&" + employment;
 
-        System.out.println("Djinni URL: " + url);
 
         try {
             // Use a desktop-like User-Agent
