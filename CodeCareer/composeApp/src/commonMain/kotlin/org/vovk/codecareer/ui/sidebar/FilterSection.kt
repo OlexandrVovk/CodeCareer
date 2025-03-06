@@ -34,8 +34,41 @@ fun FilterSection() {
 
         Text("Employment", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         EmploymentFilterButtons(filterStateManager)
+        ApplyFiltersOrClear(filterStateManager)
     }
 }
+
+@Composable
+fun ApplyFiltersOrClear(filterStateManager: FilterStateManager) {
+    // Action buttons row
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Button(
+            onClick = { filterStateManager.applyFilters() },
+            modifier = Modifier.weight(1f),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(0xFF4CAF50)
+            )
+        ) {
+            Text("Apply Filters", color = Color.White)
+        }
+
+        Button(
+            onClick = { filterStateManager.clearAllFilters() },
+            modifier = Modifier.weight(1f),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(0xFFE57373)
+            )
+        ) {
+            Text("Clear All", color = Color.White)
+        }
+    }
+}
+
 
 @Composable
 fun FilterCategoryButton(

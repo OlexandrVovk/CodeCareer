@@ -63,4 +63,16 @@ class FilterStateManager {
         val filterDataEntity = getFilterDataEntity()
         println("Current Filters: $filterDataEntity")
     }
+
+    fun applyFilters() {
+        val filterDataEntity = getFilterDataEntity()
+        println("APPLYING FILTERS: $filterDataEntity")
+    }
+
+    fun clearAllFilters() {
+        selectedCategories.clear()
+        selectedExperiences.clear()
+        selectedEmploymentTypes.clear()
+        println("All filters cleared")
+    }
 }
