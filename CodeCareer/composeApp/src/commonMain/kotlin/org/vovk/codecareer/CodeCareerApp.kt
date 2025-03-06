@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.vovk.codecareer.ui.JobsPage
 import org.vovk.codecareer.ui.sidebar.FilterSection
-import org.vovk.codecareer.ui.sidebar.ProfileSection
 
 @Composable
 fun App(){
@@ -70,7 +69,6 @@ fun JobSearchScreen() {
                         .weight(1f)
                         .background(Color.Gray.copy(alpha = 0.2f))
                 ) {
-                    ProfileSection()
                     FilterSection()
                 }
             }

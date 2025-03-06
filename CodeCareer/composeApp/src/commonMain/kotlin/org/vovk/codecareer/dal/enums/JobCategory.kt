@@ -1,6 +1,6 @@
 package org.vovk.codecareer.dal.enums
 
-enum class JobCategories {
+enum class JobCategory {
     JAVA,
     C,
     PYTHON,

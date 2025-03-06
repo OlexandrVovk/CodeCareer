@@ -1,6 +1,6 @@
 package org.vovk.codecareer.dal.enums
 
-enum class EmploymentTypes {
+enum class EmploymentType {
     `Remote work`,
     `Part-time`,
     `Office`
