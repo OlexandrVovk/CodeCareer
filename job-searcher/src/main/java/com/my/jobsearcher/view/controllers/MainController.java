@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @AllArgsConstructor
@@ -23,18 +23,37 @@ public class MainController {
 
     @SneakyThrows
     @GetMapping("")
-    public List<ResponseDto> getVacancies(@RequestParam("language") String lan,
-                                  @RequestParam(value = "exp", required = false) String exp,
-                                  @RequestParam(value = "employment", required = false) String emp){
-        if (exp == null) exp = "ALL";
-        if (emp == null) emp = "BOTH";
-        VacancyRequest vacancyRequest = VacancyRequest.builder()
-                .lang(Language.valueOf(lan.toUpperCase()))
-                .exp(Experience.valueOf(exp.toUpperCase()))
-                .emp(Employment.valueOf(emp.toUpperCase()))
-                .build();
+    public Set<ResponseDto> getVacancies(
+            @RequestParam("language") List<String> langs,
+            @RequestParam(value = "exp", required = false) List<String> exps,
+            @RequestParam(value = "employment", required = false) List<String> emps) {
+        if (exps == null || exps.isEmpty()) {
+            exps = Collections.singletonList("ALL");
+        }
+        if (emps == null || emps.isEmpty()) {
+            emps = Collections.singletonList("BOTH");
+        }
+        List<VacancyRequest> vacancyRequests = new ArrayList<>();
+        for (String lan : langs) {
+            Language language = Language.valueOf(lan.toUpperCase());
+            for (String exp : exps) {
+                Experience experience = Experience.valueOf(exp.toUpperCase());
+                for (String emp : emps) {
+                    Employment employment = Employment.valueOf(emp.toUpperCase());
+                    VacancyRequest request = VacancyRequest.builder()
+                            .lang(language)
+                            .exp(experience)
+                            .emp(employment)
+                            .build();
+                    vacancyRequests.add(request);
+                }
+            }
+        }
 
-        return service.getVacancies(vacancyRequest);
+        Set<ResponseDto> responseSet = new HashSet<>();
+        for (VacancyRequest request : vacancyRequests) {
+            responseSet.addAll(service.getVacancies(request));
+        }
+        return responseSet;
     }
-
 }

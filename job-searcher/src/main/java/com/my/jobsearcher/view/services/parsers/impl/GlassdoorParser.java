@@ -28,7 +28,7 @@ public class GlassdoorParser implements Parser {
     @Value("${glassdoor.api.key}")
     private String glassdoorApiKey;
 
-    private static final String API_URL = "https://glassdoor-real-time.p.rapidapi.com/jobs/search?query=Java%20Developer&locationId=eyJ0IjoiTiIsImlkIjoyNDQsIm4iOiJVa3JhaW5lIn0%3D&seniorityLevel=entrylevel&remoteOnly=true";
+    private static final String API_URL = "https://glassdoor-real-time.p.rapidapi.com/jobs/search?query=";
 
 
     public List<ResponseDto> getVacancies(VacancyRequest vacancyRequest) {
@@ -45,7 +45,7 @@ public class GlassdoorParser implements Parser {
             case OFFICE, BOTH -> "false";
         };
 
-        String request_url = "https://glassdoor-real-time.p.rapidapi.com/jobs/search?query="
+        String request_url = API_URL
                 + vacancyRequest.getLang().toString().toLowerCase()
                 + "&locationId=eyJ0IjoiTiIsImlkIjoyNDQsIm4iOiJVa3JhaW5lIn0%3D"; //Ukraine location
 //                + "&remoteOnly=" + employment;
