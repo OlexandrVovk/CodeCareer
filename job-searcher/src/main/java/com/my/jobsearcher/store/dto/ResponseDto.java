@@ -11,4 +11,6 @@ public class ResponseDto {
     private String jobTitle;
     private String url;
     private String company;
+    private String description;
+    private String companyImage;
 }

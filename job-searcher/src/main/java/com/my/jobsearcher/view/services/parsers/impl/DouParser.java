@@ -24,7 +24,7 @@ public class DouParser implements Parser {
 
     @Override
     public List<ResponseDto> getVacancies(VacancyRequest vacancyRequest) {
-        List<ResponseDto> resultList = new ArrayList<>();
+        List<ResponseDto> resultList = null;
 
         String expLvl;
         if (vacancyRequest.getExp() == Experience.JUNIOR) {
@@ -69,6 +69,16 @@ public class DouParser implements Parser {
 
             Element companyEl = jobElem.selectFirst("a.company");
             String companyName = (companyEl != null) ? companyEl.text() : "";
+            String imageUrl = "";
+            if (companyEl != null) {
+                Element imgEl = companyEl.selectFirst("img.f-i");
+                if (imgEl != null) {
+                    imageUrl = imgEl.attr("src");
+                }
+            }
+
+            Element descriptionEl = jobElem.selectFirst("div.sh-info");
+            String description = (descriptionEl != null) ? descriptionEl.text() : "";
 
             Element cityEl = jobElem.selectFirst("span.cities");
             String cityText = (cityEl != null) ? cityEl.text() : "";
@@ -78,6 +88,8 @@ public class DouParser implements Parser {
                         .jobTitle(jobTitle)
                         .company(companyName)
                         .url(jobUrl)
+                        .description(description)
+                        .companyImage(imageUrl)
                         .build());
             }
         }

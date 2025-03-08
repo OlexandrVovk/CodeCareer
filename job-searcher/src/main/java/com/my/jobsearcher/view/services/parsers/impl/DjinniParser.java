@@ -74,22 +74,35 @@ public class DjinniParser implements Parser {
             if (titleLink == null) {
                 continue;
             }
-
             String title = titleLink.text();
             String link = titleLink.attr("href");
             if (!link.startsWith("http")) {
                 link = DJINNI_URL + link;
             }
+
             Element companyLink = li.selectFirst("a.text-body.js-analytics-event");
             String companyName = (companyLink != null) ? companyLink.text() : "";
+
+            Element descriptionElement = li.selectFirst("span.js-original-text.d-none");
+            String description = (descriptionElement != null) ? descriptionElement.text() : "";
+
+            Element companyImageDiv = li.selectFirst("div.userpic-wrapper.is-company-logo");
+            String companyImage = "";
+            if (companyImageDiv != null) {
+                Element img = companyImageDiv.selectFirst("img.userpic-image_img");
+                if (img != null) {
+                    companyImage = img.attr("src");
+                }
+            }
 
             vacancies.add(ResponseDto.builder()
                     .jobTitle(title)
                     .company(companyName)
                     .url(link)
+                    .description(description)
+                    .companyImage(companyImage)
                     .build());
         }
-
         return vacancies;
     }
 }
