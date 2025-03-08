@@ -1,16 +1,21 @@
 package org.vovk.codecareer.dal.filters
 
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.unit.dp
 import org.vovk.codecareer.dal.entities.FilterDataEntity
 import org.vovk.codecareer.dal.enums.EmploymentType
 import org.vovk.codecareer.dal.enums.JobCategory
 import org.vovk.codecareer.dal.enums.WorkingExperience
 
+external fun sendRequest(text: String) : String
+
+
 class FilterStateManager {
     private val selectedCategories: SnapshotStateList<JobCategory> = mutableStateListOf()
     private val selectedExperiences: SnapshotStateList<WorkingExperience> = mutableStateListOf()
     private val selectedEmploymentTypes: SnapshotStateList<EmploymentType> = mutableStateListOf()
+    private val vacancyServiceUrl: String = "http://localhost:3000/?"
 
     fun toggleCategory(category: JobCategory) {
         if (selectedCategories.contains(category)) {
@@ -66,13 +71,36 @@ class FilterStateManager {
 
     fun applyFilters() {
         val filterDataEntity = getFilterDataEntity()
-        println("APPLYING FILTERS: $filterDataEntity")
+        val queryParams = mutableListOf<String>()
+
+        if (filterDataEntity.categories.isNotEmpty()) {
+            val languages = filterDataEntity.categories.joinToString(separator = ",") {
+                it.name.lowercase()
+            }
+            queryParams.add("language=$languages")
+        }
+
+        if (filterDataEntity.experiences.isNotEmpty()) {
+            val experiences = filterDataEntity.experiences.joinToString(separator = ",") {
+                it.name.lowercase()
+            }
+            queryParams.add("exp=$experiences")
+        }
+
+        if (filterDataEntity.employmentTypes.isNotEmpty()) {
+            val employments = filterDataEntity.employmentTypes.joinToString(separator = ",") {
+                it.name.lowercase().replace(" ", "")
+            }
+            queryParams.add("employment=$employments")
+        }
+
+        val fullUrl = vacancyServiceUrl + queryParams.joinToString("&")
+        sendRequest(fullUrl)
     }
 
     fun clearAllFilters() {
         selectedCategories.clear()
         selectedExperiences.clear()
         selectedEmploymentTypes.clear()
-        println("All filters cleared")
     }
 }

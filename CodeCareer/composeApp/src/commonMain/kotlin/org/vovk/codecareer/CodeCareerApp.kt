@@ -13,12 +13,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.browser.window
 import org.vovk.codecareer.ui.JobsPage
 import org.vovk.codecareer.ui.sidebar.FilterSection
 
 @Composable
 fun App(){
     MainScreenWrapper()
+    initEventListeners()
+}
+
+fun initEventListeners() {
+    window.addEventListener("vacanciesUpdated", vacanciesUpdatedListener)
 }
 
 @Composable

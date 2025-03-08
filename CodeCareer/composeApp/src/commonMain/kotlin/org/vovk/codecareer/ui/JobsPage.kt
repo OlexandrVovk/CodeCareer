@@ -8,39 +8,58 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.vovk.codecareer.dal.entities.JobCartEntity
+import org.vovk.codecareer.dal.vacancies.VacanciesEntityManager
 
 @Composable
 fun JobsPage(windowSize: Float = 0.7f) {
-    val jobList = listOf(
-        JobCartEntity("Google", "Kotlin Developer", "Developing Android apps using Kotlin", listOf("Kotlin", "Android", "Jetpack"), "$100k"),
-        JobCartEntity("Amazon", "Backend Engineer", "Building scalable microservices", listOf("Kotlin", "Spring Boot", "AWS"), "$120k"),
-        JobCartEntity("Facebook", "Mobile Developer", "Working on Messenger", listOf("Compose", "Kotlin", "iOS"), "$110k")
-    )
+
+    var jobs by remember { mutableStateOf(VacanciesEntityManager.getVacancies()) }
+
     Column(
         modifier = Modifier.fillMaxWidth(windowSize),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Вакансії: ${jobList.size}",
+            text = "Вакансії: ${jobs.size}",
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        LazyColumn {
-            items(jobList) { job ->
-                JobCard(job)
+
+        if (jobs.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Use filters to search vacancies",
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color.Gray
+                )
+            }
+        } else {
+            LazyColumn {
+                items(jobs) { job ->
+                    JobCard(job)
+                }
             }
         }
     }
 }
+
 
 @Composable
 fun JobCard(job: JobCartEntity) {
