@@ -1,17 +1,14 @@
 package org.vovk.codecareer.ui
 
 import CircleShapeIcon
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -71,14 +68,13 @@ fun JobCard(job: JobCartEntity) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                CircleShapeIcon()
+                CircleShapeIcon(job.companyUrl)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(job.firmName, fontWeight = FontWeight.Bold)
+                Text(job.companyName, fontWeight = FontWeight.Bold)
             }
             Text(job.jobName, fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
             Text(job.tags.joinToString(", "), fontSize = 14.sp, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
             Text(job.jobDescription, fontSize = 14.sp)
-            Text("Salary: ${job.salary}", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Green, modifier = Modifier.padding(top = 4.dp))
         }
     }
 }

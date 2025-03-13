@@ -41,6 +41,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.kotlinx.serialization.json)
+            api("io.github.qdsfdhvh:image-loader:1.10.0")
+            runtimeOnly("io.github.qdsfdhvh:image-loader-core-wasm-js:1.10.0")
+
         }
     }
 }

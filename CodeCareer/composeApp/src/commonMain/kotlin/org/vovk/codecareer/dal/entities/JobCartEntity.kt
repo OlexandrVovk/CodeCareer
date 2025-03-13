@@ -1,9 +1,9 @@
 package org.vovk.codecareer.dal.entities
 
 data class JobCartEntity(
-    val firmName: String,
+    val companyName: String,
+    val companyUrl: String,
     val jobName: String,
     val jobDescription: String,
-    val tags: List<String>,
-    val salary: String
+    val tags: List<String>
 )

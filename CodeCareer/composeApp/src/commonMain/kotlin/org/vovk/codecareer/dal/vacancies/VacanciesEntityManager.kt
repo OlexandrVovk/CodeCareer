@@ -34,11 +34,11 @@ object VacanciesEntityManager {
         // Map the raw jobs to JobCartEntity instances.
         val jobList = jobRawList.map {
             JobCartEntity(
-                firmName = it.company,
+                companyName = it.company,
+                companyUrl = it.companyImage,
                 jobName = it.jobTitle,
                 jobDescription = it.description,
                 tags = emptyList(),
-                salary = ""
             )
         }
         _jobs.clear()
