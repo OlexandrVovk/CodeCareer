@@ -35,9 +35,10 @@ object VacanciesEntityManager {
         val jobList = jobRawList.map {
             JobCartEntity(
                 companyName = it.company,
-                companyUrl = it.companyImage,
+                companyImageUrl = it.companyImage,
                 jobName = it.jobTitle,
                 jobDescription = it.description,
+                jobUrl = it.url,
                 tags = emptyList(),
             )
         }
