@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.vovk.codecareer.dal.entities.JobCartEntity
@@ -74,7 +75,12 @@ fun JobCard(job: JobCartEntity) {
             }
             Text(job.jobName, fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
             Text(job.tags.joinToString(", "), fontSize = 14.sp, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
-            Text(job.jobDescription, fontSize = 14.sp)
+            Text(
+                text = job.jobDescription,
+                fontSize = 14.sp,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
