@@ -103,6 +103,76 @@ function handleGoogleLogin(kotlinCallback) {
         });
 }
 
+function createUserWithEmail(email, password, displayName, callback) {
+    ensureInitialized()
+        .then(() => import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js'))
+        .then((firebaseAuthModule) => {
+            // Create the user with email and password
+            return firebaseAuthModule.createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Update user profile with display name
+                    const user = userCredential.user;
+                    return firebaseAuthModule.updateProfile(user, {
+                        displayName: displayName
+                    }).then(() => user);
+                });
+        })
+        .then((user) => {
+            // User created and profile updated successfully
+            const userJson = JSON.stringify({
+                success: true,
+                uid: user.uid,
+                displayName: user.displayName || displayName, // Fallback to provided displayName
+                email: user.email,
+                photoURL: user.photoURL
+            });
+            callback(userJson);
+        })
+        .catch((error) => {
+            console.error("Email registration error:", error);
+            // Handle registration errors
+            const errorJson = JSON.stringify({
+                success: false,
+                error: true,
+                code: error.code,
+                message: getErrorMessage(error.code)
+            });
+            callback(errorJson);
+        });
+}
+
+function signInWithEmail(email, password, callback) {
+    ensureInitialized()
+        .then(() => import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js'))
+        .then((firebaseAuthModule) => {
+            // Sign in with email and password
+            return firebaseAuthModule.signInWithEmailAndPassword(auth, email, password);
+        })
+        .then((userCredential) => {
+            // User signed in successfully
+            const user = userCredential.user;
+            const userJson = JSON.stringify({
+                success: true,
+                uid: user.uid,
+                displayName: user.displayName,
+                email: user.email,
+                photoURL: user.photoURL
+            });
+            callback(userJson);
+        })
+        .catch((error) => {
+            console.error("Email sign-in error:", error);
+            // Handle sign-in errors
+            const errorJson = JSON.stringify({
+                success: false,
+                error: true,
+                code: error.code,
+                message: getErrorMessage(error.code)
+            });
+            callback(errorJson);
+        });
+}
+
 function signOut() {
     ensureInitialized().then(() => {
         import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js')
@@ -118,5 +188,32 @@ function signOut() {
     })
 }
 
+function getErrorMessage(errorCode) {
+    switch (errorCode) {
+        case 'auth/email-already-in-use':
+            return 'This email is already registered. Please sign in or use a different email.';
+        case 'auth/invalid-email':
+            return 'The email address is not valid.';
+        case 'auth/operation-not-allowed':
+            return 'Email/password accounts are not enabled for this app.';
+        case 'auth/weak-password':
+            return 'The password is too weak. Please choose a stronger password.';
+        case 'auth/user-disabled':
+            return 'This account has been disabled. Please contact support.';
+        case 'auth/user-not-found':
+            return 'No account found with this email. Please check your email or register.';
+        case 'auth/wrong-password':
+            return 'Incorrect password. Please try again or reset your password.';
+        case 'auth/too-many-requests':
+            return 'Too many unsuccessful login attempts. Please try again later.';
+        case 'auth/network-request-failed':
+            return 'Network error. Please check your internet connection and try again.';
+        default:
+            return `Authentication error: ${errorCode}`;
+    }
+}
+
 globalThis.handleGoogleLogin = handleGoogleLogin;
 globalThis.signOut = signOut;
+globalThis.createUserWithEmail = createUserWithEmail;
+globalThis.signInWithEmail = signInWithEmail;

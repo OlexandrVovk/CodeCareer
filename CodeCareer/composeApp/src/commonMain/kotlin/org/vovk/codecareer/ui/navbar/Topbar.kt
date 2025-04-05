@@ -77,6 +77,23 @@ fun CodeCareerTopAppBar(
             }
             Box{
                 if (isLoggedIn && currentUser != null){
+                    if (currentUser.photoURL == null){
+                        Box(
+                            modifier = Modifier
+                                .background(Color(0xFFE0E0E0))
+                                .clickable {
+                                    navigator.push(AccountPage())
+                                }
+                        ) {
+                            Text(
+                                text = "?",
+                                color = Color.Gray,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                    }
                     currentUser.photoURL?.let {
                         AutoSizeBox(it,
                             modifier = Modifier.clickable {

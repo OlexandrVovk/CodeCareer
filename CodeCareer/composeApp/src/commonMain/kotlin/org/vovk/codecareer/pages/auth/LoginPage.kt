@@ -360,10 +360,19 @@ class LoginPage : Screen {
                 Button(
                     onClick = {
                         isLoading = true
-
                         // Simulate auth check - in real app, call your auth service
                         if (isValidEmail(email) && isValidPassword(password)) {
-                            // Todo
+                            firebaseAuth.signInWithEmail(
+                                email = email,
+                                password = password
+                            ) { success, errorMessage ->
+                                isLoading = false
+                                if (success) {
+                                    navigator.popUntilRoot()
+                                } else {
+                                    authError = errorMessage ?: "Login failed"
+                                }
+                            }
                         } else {
                             // Invalid credentials
                             authError = "Invalid email or password. Please try again."

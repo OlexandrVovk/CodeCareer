@@ -1,47 +1,12 @@
 package org.vovk.codecareer.dal.firebase
 
-import kotlinx.browser.window
-import org.w3c.dom.events.Event
-
 // External JS functions declaration
+external fun createUserWithEmail(email: String, password: String, displayName: String, callback: (String) -> Unit)
+external fun signInWithEmail(email: String, password: String, callback: (String) -> Unit)
 external fun handleGoogleLogin(callback: (String) -> Unit)
 external fun signOut()
 
 class FirebaseAuthManager {
-    // Callback references to prevent garbage collection
-    private var authStateListener: ((Event) -> Unit)? = null
-
-//    init {
-//        // Setup auth state change listener from JS
-//        setupAuthStateListener()
-//    }
-
-//    private fun setupAuthStateListener() {
-//        // Create new listener
-//        authStateListener = { event ->
-//            // Check if event has detail property with user data
-//            val customEvent = event
-//            val userDataJson = customEvent .detail as? String
-//
-//            if (userDataJson != null) {
-//                // Process auth state change (can be login or logout)
-//                processAuthStateChange(userDataJson)
-//            }
-//        }
-//
-//        // Add the listener
-//        window.addEventListener("authStateChanged", authStateListener)
-//    }
-
-    private fun processAuthStateChange(userDataJson: String) {
-        if (userDataJson.contains("\"signedOut\":true")) {
-            // Handle sign out event
-            UserSessionManager.clearUserSession()
-        } else {
-            // Handle sign in event
-            UserSessionManager.saveUserSession(userDataJson)
-        }
-    }
 
     // Trigger Google login
     fun loginWithGoogle(onSuccess: () -> Unit) {
@@ -51,16 +16,61 @@ class FirebaseAuthManager {
         }
     }
 
+    fun registerWithEmail(
+        email: String,
+        password: String,
+        displayName: String,
+        callback: (success: Boolean, errorMessage: String?) -> Unit
+    ) {
+        createUserWithEmail(email, password, displayName) { response ->
+            if (response.contains("\"success\":true")) {
+                callback(true, null)
+            } else {
+                // Parse error message
+                val errorStart = response.indexOf("\"message\":\"")
+                val errorMessage = if (errorStart >= 0) {
+                    val start = errorStart + 11 // length of "message":"
+                    val end = response.indexOf("\"", start)
+                    if (end >= 0) response.substring(start, end) else "Unknown error"
+                } else {
+                    "Registration failed"
+                }
+                callback(false, errorMessage)
+            }
+        }
+        println("Registering with email: $email")
+    }
+
+    fun signInWithEmail(
+        email: String,
+        password: String,
+        callback: (success: Boolean, errorMessage: String?) -> Unit
+    ) {
+        signInWithEmail(email, password) { response ->
+            if (response.contains("\"success\":true")) {
+                // Success - save the user session
+                UserSessionManager.saveUserSession(response)
+                callback(true, null)
+            } else {
+                // Parse error message
+                val errorStart = response.indexOf("\"message\":\"")
+                val errorMessage = if (errorStart >= 0) {
+                    val start = errorStart + 11 // length of "message":"
+                    val end = response.indexOf("\"", start)
+                    if (end >= 0) response.substring(start, end) else "Unknown error"
+                } else {
+                    "Registration failed"
+                }
+                callback(false, errorMessage)
+            }
+        }
+    }
+
     // Sign out the current user
     fun toSignOut() {
         signOut()
         UserSessionManager.clearUserSession()
     }
 
-    // Clean up listeners when no longer needed
-    fun cleanup() {
-        authStateListener?.let { listener ->
-            window.removeEventListener("authStateChanged", listener)
-        }
-    }
+
 }
