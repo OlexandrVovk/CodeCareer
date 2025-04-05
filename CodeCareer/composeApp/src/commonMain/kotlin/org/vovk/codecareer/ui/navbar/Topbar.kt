@@ -1,9 +1,7 @@
 package org.vovk.codecareer.ui.navbar
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.* // Use material or material3 based on your project setup
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle // Example profile icon
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,14 +14,16 @@ import androidx.compose.ui.unit.sp
  *
  * @param modifier Optional Modifier for the TopAppBar.
  * @param onNavigateToJobs Callback invoked when the "Jobs" item is clicked.
- * @param onNavigateToProfile Callback invoked when the "Profile" action is clicked.
+ * @param onNavigateToLogin Callback invoked when the "Login" action is clicked.
+ * @param onNavigateToRegister Callback invoked when the "Register" action is clicked.
  * @param isJobsActive Indicates if the Jobs page is the current active page to potentially highlight it.
  */
 @Composable
 fun CodeCareerTopAppBar(
     modifier: Modifier = Modifier,
     onNavigateToJobs: () -> Unit,
-    onNavigateToProfile: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToRegister: () -> Unit,
     isJobsActive: Boolean = true
 ) {
     TopAppBar(
@@ -62,12 +62,11 @@ fun CodeCareerTopAppBar(
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onNavigateToProfile) {
-                    Icon(
-                        imageVector = Icons.Filled.AccountCircle, // Standard profile icon
-                        contentDescription = "Profile", // Accessibility
-                        tint = MaterialTheme.colors.onSurface.copy(alpha = 0.8f) // Adjust tint as needed
-                    )
+                IconButton(onClick = onNavigateToLogin) {
+                    Text("Login")
+                }
+                IconButton(onClick = onNavigateToRegister) {
+                    Text("Register")
                 }
             }
         }

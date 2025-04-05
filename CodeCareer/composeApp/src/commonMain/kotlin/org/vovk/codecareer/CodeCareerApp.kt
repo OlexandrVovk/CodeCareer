@@ -10,7 +10,8 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.browser.window
 import org.vovk.codecareer.pages.JobSearchScreen
-import org.vovk.codecareer.pages.ProfilePage
+import org.vovk.codecareer.pages.LoginPage
+import org.vovk.codecareer.pages.RegisterPage
 import org.vovk.codecareer.ui.navbar.CodeCareerTopAppBar
 
 @Composable
@@ -48,8 +49,11 @@ fun MainScreenWrapper() {
                             onNavigateToJobs = {
                                 navigator.push(JobSearchScreen())
                             },
-                            onNavigateToProfile = {
-                                navigator.push(ProfilePage())
+                            onNavigateToLogin = {
+                                navigator.push(LoginPage())
+                            },
+                            onNavigateToRegister = {
+                                navigator.push(RegisterPage())
                             }
                         )
                         Box(
