@@ -9,6 +9,10 @@ plugins {
     alias(libs.plugins.kotlinxSerialization)
 }
 
+repositories {
+    mavenCentral()
+}
+
 kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -32,6 +36,7 @@ kotlin {
     
     sourceSets {
         commonMain.dependencies {
+            val voyagerVersion = "1.1.0-beta03"
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
@@ -44,6 +49,19 @@ kotlin {
             api("io.github.qdsfdhvh:image-loader:1.10.0")
             runtimeOnly("io.github.qdsfdhvh:image-loader-core-wasm-js:1.10.0")
 
+//           voyager dependencies
+            // Navigator
+            implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+            // Screen Model
+            implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
+            // BottomSheetNavigator
+            implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
+            // TabNavigator
+            implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
+            // Transitions
+            implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
+            // Koin integration
+            implementation("cafe.adriel.voyager:voyager-koin:$voyagerVersion")
         }
     }
 }
