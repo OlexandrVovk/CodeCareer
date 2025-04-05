@@ -10,6 +10,8 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.browser.window
 import org.vovk.codecareer.pages.JobSearchScreen
+import org.vovk.codecareer.pages.ProfilePage
+import org.vovk.codecareer.ui.navbar.CodeCareerTopAppBar
 
 @Composable
 fun App(){
@@ -40,7 +42,26 @@ fun MainScreenWrapper() {
                     .fillMaxHeight()
                     .background(Color.White)
             ) {
-                Navigator(screen = JobSearchScreen())
+                Navigator(screen = JobSearchScreen()) { navigator: Navigator ->
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        CodeCareerTopAppBar(
+                            onNavigateToJobs = {
+                                navigator.push(JobSearchScreen())
+                            },
+                            onNavigateToProfile = {
+                                navigator.push(ProfilePage())
+                            }
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                        ) {
+                            val currentScreen = navigator.lastItem
+                            currentScreen.Content()
+                        }
+                    }
+                }
             }
         }
     }

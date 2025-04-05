@@ -28,7 +28,6 @@ class JobSearchScreen: Screen {
         ) {
             val (isFilterOverlayVisible, setFilterOverlayVisible) = remember { mutableStateOf(false) }
             val screenWidth = maxWidth
-            println(screenWidth)
 
             if (screenWidth > 1023.dp) {
                 Row(
