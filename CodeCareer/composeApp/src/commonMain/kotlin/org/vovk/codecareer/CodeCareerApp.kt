@@ -9,10 +9,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.browser.window
+import org.vovk.codecareer.dal.vacancies.VacanciesEntityManager
+import org.vovk.codecareer.dal.vacancies.VacanciesObject
 import org.vovk.codecareer.pages.JobSearchScreen
 import org.vovk.codecareer.pages.LoginPage
 import org.vovk.codecareer.pages.RegisterPage
 import org.vovk.codecareer.ui.navbar.CodeCareerTopAppBar
+import org.w3c.dom.events.Event
 
 @Composable
 fun App(){
@@ -21,6 +24,9 @@ fun App(){
 }
 
 fun initEventListeners() {
+    val vacanciesUpdatedListener: (Event) -> Unit = { event ->
+        VacanciesEntityManager.parseJsonToJobCartEntityList(VacanciesObject.vacanciesString)
+    }
     window.addEventListener("vacanciesUpdated", vacanciesUpdatedListener)
 }
 

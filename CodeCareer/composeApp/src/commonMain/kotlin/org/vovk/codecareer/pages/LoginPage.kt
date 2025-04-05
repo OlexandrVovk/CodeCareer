@@ -13,18 +13,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+
+external fun handleGoogleLogin(callback: (String) -> Unit)
+
 
 class LoginPage : Screen {
 
@@ -358,7 +358,12 @@ class LoginPage : Screen {
 
                         // Simulate auth check - in real app, call your auth service
                         if (isValidEmail(email) && isValidPassword(password)) {
-                            // Successful login logic
+//                            handleGoogleLogin { messageFromJs ->
+//                                // 4. Inside the callback (executed by JS), receive the string
+//                                //    and print it.
+//                                println("Kotlin: Received message from JS event: '$messageFromJs'")
+//                            }
+//                            println("Kotlin: Event initiated, waiting for JS response...")
                         } else {
                             // Invalid credentials
                             authError = "Invalid email or password. Please try again."
@@ -409,7 +414,11 @@ class LoginPage : Screen {
 
                 // Google Login Button
                 OutlinedButton(
-                    onClick = { /* Handle Google OAuth login */ },
+                    onClick = {
+                        handleGoogleLogin { messageFromJs ->
+                            println("Kotlin: Received message from JS event: '$messageFromJs'")
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
