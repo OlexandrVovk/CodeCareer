@@ -104,21 +104,19 @@ function handleGoogleLogin(kotlinCallback) {
 }
 
 function signOut() {
-    if (!initialized || !auth) {
-        console.error("Firebase not initialized");
-        return;
-    }
-
-    import('https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js')
-        .then((firebaseAuthModule) => {
-            return firebaseAuthModule.signOut(auth);
-        })
-        .then(() => {
-            console.log("User signed out successfully");
-        })
-        .catch((error) => {
-            console.error("Sign out error:", error);
-        });
+    ensureInitialized().then(() => {
+        import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js')
+            .then((firebaseAuthModule) => {
+                return firebaseAuthModule.signOut(auth);
+            })
+            .then(() => {
+                console.log("User signed out successfully");
+            })
+            .catch((error) => {
+                console.error("Sign out error:", error);
+            });
+    })
 }
 
 globalThis.handleGoogleLogin = handleGoogleLogin;
+globalThis.signOut = signOut;

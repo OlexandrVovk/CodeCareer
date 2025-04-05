@@ -1,4 +1,4 @@
-package org.vovk.codecareer.pages
+package org.vovk.codecareer.pages.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,6 +22,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import org.vovk.codecareer.dal.firebase.FirebaseAuthManager
 
 external fun handleGoogleLogin(callback: (String) -> Unit)
 
@@ -72,6 +75,8 @@ class LoginPage : Screen {
 
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val firebaseAuth = remember { FirebaseAuthManager() }
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
         var passwordVisible by remember { mutableStateOf(false) }
@@ -358,12 +363,7 @@ class LoginPage : Screen {
 
                         // Simulate auth check - in real app, call your auth service
                         if (isValidEmail(email) && isValidPassword(password)) {
-//                            handleGoogleLogin { messageFromJs ->
-//                                // 4. Inside the callback (executed by JS), receive the string
-//                                //    and print it.
-//                                println("Kotlin: Received message from JS event: '$messageFromJs'")
-//                            }
-//                            println("Kotlin: Event initiated, waiting for JS response...")
+                            // Todo
                         } else {
                             // Invalid credentials
                             authError = "Invalid email or password. Please try again."
@@ -415,9 +415,13 @@ class LoginPage : Screen {
                 // Google Login Button
                 OutlinedButton(
                     onClick = {
-                        handleGoogleLogin { messageFromJs ->
-                            println("Kotlin: Received message from JS event: '$messageFromJs'")
-                        }
+                        firebaseAuth.loginWithGoogle(onSuccess = {
+                            isLoading = false
+                            navigator.popUntilRoot()
+                        })
+//                        handleGoogleLogin { messageFromJs ->
+//                            println("Kotlin: Received message from JS event: '$messageFromJs'")
+//                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()

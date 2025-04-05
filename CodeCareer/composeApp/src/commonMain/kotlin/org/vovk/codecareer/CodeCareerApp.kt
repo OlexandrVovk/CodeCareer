@@ -12,8 +12,8 @@ import kotlinx.browser.window
 import org.vovk.codecareer.dal.vacancies.VacanciesEntityManager
 import org.vovk.codecareer.dal.vacancies.VacanciesObject
 import org.vovk.codecareer.pages.JobSearchScreen
-import org.vovk.codecareer.pages.LoginPage
-import org.vovk.codecareer.pages.RegisterPage
+import org.vovk.codecareer.pages.auth.LoginPage
+import org.vovk.codecareer.pages.auth.RegisterPage
 import org.vovk.codecareer.ui.navbar.CodeCareerTopAppBar
 import org.w3c.dom.events.Event
 
@@ -60,7 +60,8 @@ fun MainScreenWrapper() {
                             },
                             onNavigateToRegister = {
                                 navigator.push(RegisterPage())
-                            }
+                            },
+                            navigator = navigator
                         )
                         Box(
                             modifier = Modifier
