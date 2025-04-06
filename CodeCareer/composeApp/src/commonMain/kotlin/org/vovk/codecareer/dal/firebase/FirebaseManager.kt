@@ -1,10 +1,20 @@
 package org.vovk.codecareer.dal.firebase
 
-// External JS functions declaration
+import org.vovk.codecareer.dal.entities.JobCartEntity
+
+// Auth JS functions declaration
 external fun createUserWithEmail(email: String, password: String, displayName: String, callback: (String) -> Unit)
 external fun signInWithEmail(email: String, password: String, callback: (String) -> Unit)
 external fun handleGoogleLogin(callback: (String) -> Unit)
 external fun signOut()
+
+// Vacancies JS functions declaration
+external fun addNewVacancyTrack(companyName: String,
+                                companyImageUrl: String,
+                                jobName: String,
+                                jobDescription: String,
+                                jobUrl: String,
+                                callback: (String) -> Unit)
 
 class FirebaseAuthManager {
 
@@ -72,5 +82,15 @@ class FirebaseAuthManager {
         UserSessionManager.clearUserSession()
     }
 
-
+    fun toAddNewVacancyTrack(vacancy: JobCartEntity){
+        addNewVacancyTrack(
+            companyName = vacancy.companyName,
+            companyImageUrl = vacancy.companyImageUrl,
+            jobName = vacancy.jobName,
+            jobDescription = vacancy.jobDescription,
+            jobUrl = vacancy.jobUrl
+        ){response ->
+            println(response)
+        }
+    }
 }

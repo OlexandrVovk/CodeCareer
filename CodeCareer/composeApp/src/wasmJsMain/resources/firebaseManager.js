@@ -77,16 +77,6 @@ function handleGoogleLogin(kotlinCallback) {
                 photoURL: user.photoURL
             })
             kotlinCallback(userJson);
-            // // Dispatch login success event
-            // window.dispatchEvent(new CustomEvent('googleLoginResult', {
-            //     detail: JSON.stringify({
-            //         success: true,
-            //         uid: user.uid,
-            //         displayName: user.displayName,
-            //         email: user.email,
-            //         photoURL: user.photoURL
-            //     })
-            // }));
         })
         .catch((error) => {
             console.error("Google auth error:", error);
@@ -213,7 +203,196 @@ function getErrorMessage(errorCode) {
     }
 }
 
+function signInFromSession(uid, displayName, email, callback) {
+    ensureInitialized()
+        .then(() => import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js'))
+        .then((firebaseAuthModule) => {
+            // Check if a user is already signed in
+            const currentUser = auth.currentUser;
+
+            if (currentUser) {
+                console.log("User already signed in:", currentUser.email);
+                // User is already signed in - just return their info
+                const userJson = JSON.stringify({
+                    success: true,
+                    uid: currentUser.uid,
+                    displayName: currentUser.displayName,
+                    email: currentUser.email,
+                    photoURL: currentUser.photoURL
+                });
+                callback(userJson);
+                return;
+            }
+
+            console.log("No user currently signed in, attempting to restore session");
+
+            // Since we can't sign in anonymously and we don't have the password,
+            // we'll use the persistent session that Firebase maintains
+
+            // Set persistence to LOCAL (browser persistence)
+            firebaseAuthModule.setPersistence(auth, firebaseAuthModule.browserLocalPersistence)
+                .then(() => {
+                    console.log("Persistence set to LOCAL");
+
+                    // Instead of trying to sign in again, we'll check if Firebase
+                    // can restore the auth state on its own
+
+                    // Add a one-time auth state change listener
+                    const unsubscribe = firebaseAuthModule.onAuthStateChanged(auth, (user) => {
+                        unsubscribe(); // Unsubscribe immediately after first callback
+
+                        if (user) {
+                            console.log("Firebase restored auth state for:", user.email);
+                            // Firebase restored the auth state
+                            const userJson = JSON.stringify({
+                                success: true,
+                                uid: user.uid,
+                                displayName: user.displayName,
+                                email: user.email,
+                                photoURL: user.photoURL
+                            });
+                            callback(userJson);
+                        } else {
+                            console.log("Firebase could not restore auth state");
+                            // Firebase couldn't restore auth state
+                            // Return session data with a warning
+                            const userJson = JSON.stringify({
+                                success: true,
+                                uid: uid,
+                                displayName: displayName,
+                                email: email,
+                                photoURL: null,
+                                warning: "Authentication state could not be fully restored. Some features might be limited until you log in again."
+                            });
+                            callback(userJson);
+                        }
+                    });
+
+                    // Set a timeout in case the auth state change doesn't fire
+                    setTimeout(() => {
+                        console.log("Auth state change timeout - returning session data");
+                        const userJson = JSON.stringify({
+                            success: true,
+                            uid: uid,
+                            displayName: displayName,
+                            email: email,
+                            photoURL: null,
+                            warning: "Session restoration timed out. Please log in again for full functionality."
+                        });
+                        callback(userJson);
+                    }, 3000); // 3 second timeout
+                })
+                .catch((error) => {
+                    console.error("Error setting persistence:", error);
+                    // Return session data with a warning
+                    const userJson = JSON.stringify({
+                        success: true,
+                        uid: uid,
+                        displayName: displayName,
+                        email: email,
+                        photoURL: null,
+                        warning: "There was an error restoring your session. Please log in again."
+                    });
+                    callback(userJson);
+                });
+        })
+        .catch((error) => {
+            console.error("Error initializing Firebase for session sign-in:", error);
+            const errorJson = JSON.stringify({
+                success: false,
+                error: true,
+                message: "Failed to initialize Firebase for session sign-in"
+            });
+            callback(errorJson);
+        });
+}
+
+function addNewVacancyTrack(companyName, companyImageUrl, jobName, jobDescription, jobUrl, callback) {
+    // Ensure Firebase is initialized
+    ensureInitialized()
+        .then(() => {
+            // Import Firestore
+            return import('https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js');
+        })
+        .then((firestoreModule) => {
+            // Get the current user
+            const user = auth.currentUser;
+
+            if (!user) {
+                callback(JSON.stringify({
+                    success: false,
+                    error: true,
+                    message: "User not authenticated"
+                }));
+                return;
+            }
+
+            console.log("Current user:", user.email);
+
+            // Initialize Firestore
+            const firestore = firestoreModule.getFirestore(firebaseApp);
+
+            // Encode the job URL to make it safe for use as a document ID
+            // This replaces characters that aren't allowed in Firestore document IDs
+            const encodedJobUrl = encodeURIComponent(jobUrl).replace(/\./g, '%2E');
+
+            // Create a reference to the vacancy document
+            // Use email as the user identifier in the path
+            const vacancyRef = firestoreModule.doc(
+                firestore,
+                `users/${user.email}/tracked_vacancies/${encodedJobUrl}`
+            );
+
+            console.log(`Attempting to write to: users/${user.email}/tracked_vacancies/${encodedJobUrl}`);
+
+            // Create the vacancy data
+            const vacancyData = {
+                companyName: companyName,
+                companyImageUrl: companyImageUrl,
+                jobName: jobName,
+                jobDescription: jobDescription,
+                jobUrl: jobUrl,
+                trackingStatus: "Interested", // Default status
+                notes: "",                    // Empty notes by default
+                dateAdded: firestoreModule.serverTimestamp(),
+                lastUpdated: firestoreModule.serverTimestamp()
+            };
+
+            // Add the vacancy to Firestore
+            firestoreModule.setDoc(vacancyRef, vacancyData)
+                .then(() => {
+                    // Success
+                    console.log("Vacancy tracked successfully");
+                    callback(JSON.stringify({
+                        success: true,
+                        message: "Vacancy tracked successfully"
+                    }));
+                })
+                .catch((error) => {
+                    // Error
+                    console.error("Error tracking vacancy:", error);
+                    callback(JSON.stringify({
+                        success: false,
+                        error: true,
+                        code: error.code,
+                        message: error.message || "Failed to track vacancy"
+                    }));
+                });
+        })
+        .catch((error) => {
+            // Error importing Firestore
+            console.error("Error importing Firestore:", error);
+            callback(JSON.stringify({
+                success: false,
+                error: true,
+                message: "Failed to initialize Firestore"
+            }));
+        });
+}
+
 globalThis.handleGoogleLogin = handleGoogleLogin;
 globalThis.signOut = signOut;
 globalThis.createUserWithEmail = createUserWithEmail;
 globalThis.signInWithEmail = signInWithEmail;
+globalThis.addNewVacancyTrack = addNewVacancyTrack;
+globalThis.signInFromSession = signInFromSession;

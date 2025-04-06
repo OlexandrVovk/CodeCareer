@@ -38,8 +38,7 @@ object VacanciesEntityManager {
                 companyImageUrl = it.companyImage,
                 jobName = it.jobTitle,
                 jobDescription = it.description,
-                jobUrl = it.url,
-                tags = emptyList(),
+                jobUrl = it.url
             )
         }
         _jobs.clear()

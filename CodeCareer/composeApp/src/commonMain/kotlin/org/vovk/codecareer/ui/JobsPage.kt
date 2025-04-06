@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -17,6 +18,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.vovk.codecareer.dal.entities.JobCartEntity
+import org.vovk.codecareer.dal.firebase.FirebaseAuthManager
+import org.vovk.codecareer.dal.firebase.UserSessionManager
 import org.vovk.codecareer.dal.vacancies.VacanciesEntityManager
 
 @Composable
@@ -62,6 +65,8 @@ fun JobsPage(windowSize: Float = 0.7f) {
 
 @Composable
 fun JobCard(job: JobCartEntity) {
+    val isLoggedIn = UserSessionManager.isLoggedIn()
+    val firebaseAuth = remember { FirebaseAuthManager() }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -69,11 +74,27 @@ fun JobCard(job: JobCartEntity) {
         elevation = 4.dp
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                CircleShapeIcon(job.companyImageUrl)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(job.companyName, fontWeight = FontWeight.Bold)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircleShapeIcon(job.companyImageUrl)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(job.companyName, fontWeight = FontWeight.Bold)
+                }
+                if (isLoggedIn) {
+                    Button(
+                        onClick = {firebaseAuth.toAddNewVacancyTrack(job)},
+                        modifier = Modifier.height(32.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
+                        Text("Track", fontSize = 12.sp)
+                    }
+                }
             }
+
             Text(job.jobName,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,

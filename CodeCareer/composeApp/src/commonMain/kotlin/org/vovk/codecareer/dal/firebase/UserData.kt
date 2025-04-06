@@ -16,6 +16,8 @@ data class UserData(
     val success: Boolean = true
 )
 
+external fun signInFromSession(uid: String, displayName: String, email: String ,callback: (String) -> Unit)
+
 object UserSessionManager {
     private const val USER_SESSION_KEY = "user_session"
     private val json = Json { ignoreUnknownKeys = true }
@@ -51,6 +53,12 @@ object UserSessionManager {
             if (storedUser != null) {
                 currentUser = json.decodeFromString(storedUser)
                 println("User loaded from storage: ${currentUser?.displayName}")
+                signInFromSession(currentUser!!.uid,
+                    currentUser!!.displayName.toString(),
+                    currentUser!!.email.toString()
+                ){response ->
+                    println("User loaded from storage: $response")
+                }
             }
         } catch (e: Exception) {
             println("Error loading user from storage: ${e.message}")

@@ -24,12 +24,12 @@ public class MainService {
 
         List<ResponseDto> djinniParserVacancies = djinniParser.getVacancies(vacancyRequest);
         List<ResponseDto> douParserVacancies = douParser.getVacancies(vacancyRequest);
-        List<ResponseDto> glassdoorVacancies = glassdoorParser.getVacancies(vacancyRequest);
+//        List<ResponseDto> glassdoorVacancies = glassdoorParser.getVacancies(vacancyRequest);
         //List<ResponseDto> workUaParserVacancies = workUaParser.getVacancies(vacancyRequest);
 
         resultList.addAll(djinniParserVacancies);
         resultList.addAll(douParserVacancies);
-        resultList.addAll(glassdoorVacancies);
+//        resultList.addAll(glassdoorVacancies);
         return resultList;
     }
 }

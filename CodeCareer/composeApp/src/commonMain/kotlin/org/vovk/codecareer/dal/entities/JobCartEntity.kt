@@ -5,6 +5,5 @@ data class JobCartEntity(
     val companyImageUrl: String,
     val jobName: String,
     val jobDescription: String,
-    val jobUrl: String,
-    val tags: List<String>
+    val jobUrl: String
 )
