@@ -390,9 +390,92 @@ function addNewVacancyTrack(companyName, companyImageUrl, jobName, jobDescriptio
         });
 }
 
+function getTrackedVacancies(callback) {
+    // Ensure Firebase is initialized
+    ensureInitialized()
+        .then(() => {
+            // Import Firestore
+            return import('https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js');
+        })
+        .then((firestoreModule) => {
+            // Get the current user
+            const user = auth.currentUser;
+
+            if (!user) {
+                callback(JSON.stringify({
+                    success: false,
+                    error: true,
+                    message: "User not authenticated"
+                }));
+                return;
+            }
+
+            console.log("Getting tracked vacancies for user:", user.email);
+
+            // Initialize Firestore
+            const firestore = firestoreModule.getFirestore(firebaseApp);
+
+            // Create a reference to the user's tracked vacancies collection
+            const vacanciesRef = firestoreModule.collection(
+                firestore,
+                `users/${user.email}/tracked_vacancies`
+            );
+
+            // Get all documents in the collection
+            firestoreModule.getDocs(vacanciesRef)
+                .then((querySnapshot) => {
+                    const vacancies = [];
+
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+
+                        // Map Firestore data to our vacancy object structure
+                        vacancies.push({
+                            jobInfo: {
+                                companyName: data.companyName,
+                                companyImageUrl: data.companyImageUrl,
+                                jobName: data.jobName,
+                                jobDescription: data.jobDescription,
+                                jobUrl: data.jobUrl
+                            },
+                            status: data.trackingStatus || "INTERESTED",
+                            notes: data.notes || ""
+                        });
+                    });
+
+                    console.log(`Retrieved ${vacancies.length} tracked vacancies`);
+
+                    // Return the vacancies as JSON string
+                    callback(JSON.stringify({
+                        success: true,
+                        vacancies: vacancies
+                    }));
+                })
+                .catch((error) => {
+                    console.error("Error getting tracked vacancies:", error);
+                    callback(JSON.stringify({
+                        success: false,
+                        error: true,
+                        code: error.code,
+                        message: error.message || "Failed to retrieve tracked vacancies"
+                    }));
+                });
+        })
+        .catch((error) => {
+            console.error("Error importing Firestore:", error);
+            callback(JSON.stringify({
+                success: false,
+                error: true,
+                message: "Failed to initialize Firestore"
+            }));
+        });
+}
+
+
 globalThis.handleGoogleLogin = handleGoogleLogin;
 globalThis.signOut = signOut;
 globalThis.createUserWithEmail = createUserWithEmail;
 globalThis.signInWithEmail = signInWithEmail;
 globalThis.addNewVacancyTrack = addNewVacancyTrack;
 globalThis.signInFromSession = signInFromSession;
+globalThis.getTrackedVacancies = getTrackedVacancies;

@@ -1,6 +1,12 @@
 package org.vovk.codecareer.dal.firebase
 
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.vovk.codecareer.dal.entities.JobCartEntity
+import org.vovk.codecareer.dal.entities.TrackedVacancy
+import org.vovk.codecareer.dal.entities.VacancyStatus
 
 // Auth JS functions declaration
 external fun createUserWithEmail(email: String, password: String, displayName: String, callback: (String) -> Unit)
@@ -15,8 +21,9 @@ external fun addNewVacancyTrack(companyName: String,
                                 jobDescription: String,
                                 jobUrl: String,
                                 callback: (String) -> Unit)
+external fun getTrackedVacancies(callback: (String) -> Unit)
 
-class FirebaseAuthManager {
+class FirebaseManager {
 
     // Trigger Google login
     fun loginWithGoogle(onSuccess: () -> Unit) {
@@ -92,5 +99,84 @@ class FirebaseAuthManager {
         ){response ->
             println(response)
         }
+    }
+
+    fun toGetTrackedVacancies(callback: (List<TrackedVacancy>) -> Unit) {
+        getTrackedVacancies { response ->
+            try {
+                // Parse the JSON response
+                val jsonObject = kotlinx.serialization.json.Json.parseToJsonElement(response).jsonObject
+
+                // Check if the request was successful
+                val isSuccess = jsonObject["success"]?.jsonPrimitive?.boolean ?: false
+
+                if (isSuccess) {
+                    // Extract the vacancies array
+                    val vacanciesArray = jsonObject["vacancies"]?.jsonArray
+
+                    if (vacanciesArray != null) {
+                        // Parse each vacancy in the array
+                        val trackedVacancies = vacanciesArray.mapNotNull { vacancyElement ->
+                            try {
+                                val vacancyObj = vacancyElement.jsonObject
+
+                                // Extract job info
+                                val jobInfoObj = vacancyObj["jobInfo"]?.jsonObject
+                                if (jobInfoObj != null) {
+                                    val jobCartEntity = JobCartEntity(
+                                        companyName = jobInfoObj["companyName"]?.jsonPrimitive?.content ?: "",
+                                        companyImageUrl = jobInfoObj["companyImageUrl"]?.jsonPrimitive?.content ?: "",
+                                        jobName = jobInfoObj["jobName"]?.jsonPrimitive?.content ?: "",
+                                        jobDescription = jobInfoObj["jobDescription"]?.jsonPrimitive?.content ?: "",
+                                        jobUrl = jobInfoObj["jobUrl"]?.jsonPrimitive?.content ?: ""
+                                    )
+
+                                    // Extract status and notes
+                                    val statusString = vacancyObj["status"]?.jsonPrimitive?.content ?: "INTERESTED"
+                                    val status = try {
+                                        VacancyStatus.valueOf(statusString)
+                                    } catch (e: IllegalArgumentException) {
+                                        VacancyStatus.INTERESTED // Default if invalid status
+                                    }
+
+                                    val notes = vacancyObj["notes"]?.jsonPrimitive?.content ?: ""
+
+                                    // Create TrackedVacancy object
+                                    TrackedVacancy(
+                                        jobInfo = jobCartEntity,
+                                        status = status,
+                                        notes = notes
+                                    )
+                                } else {
+                                    null
+                                }
+                            } catch (e: Exception) {
+                                println("Error parsing vacancy: ${e.message}")
+                                null
+                            }
+                        }
+
+                        println("Successfully parsed ${trackedVacancies.size} tracked vacancies")
+                        callback(trackedVacancies)
+                    } else {
+                        println("No vacancies array found in response")
+                        callback(emptyList())
+                    }
+                } else {
+                    // Handle error
+                    val errorMessage = jsonObject["message"]?.jsonPrimitive?.content
+                    println("Error retrieving tracked vacancies: $errorMessage")
+                    callback(emptyList())
+                }
+            } catch (e: Exception) {
+                println("Error parsing tracked vacancies response: ${e.message}")
+                callback(emptyList())
+            }
+        }
+    }
+
+    fun toUpdateTrackedVacancy(updatedVacancy: TrackedVacancy): Boolean {
+        // todo: implement it
+        return true
     }
 }

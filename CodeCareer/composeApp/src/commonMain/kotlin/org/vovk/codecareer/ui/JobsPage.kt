@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.vovk.codecareer.dal.entities.JobCartEntity
-import org.vovk.codecareer.dal.firebase.FirebaseAuthManager
+import org.vovk.codecareer.dal.firebase.FirebaseManager
 import org.vovk.codecareer.dal.firebase.UserSessionManager
 import org.vovk.codecareer.dal.vacancies.VacanciesEntityManager
 
@@ -66,7 +66,7 @@ fun JobsPage(windowSize: Float = 0.7f) {
 @Composable
 fun JobCard(job: JobCartEntity) {
     val isLoggedIn = UserSessionManager.isLoggedIn()
-    val firebaseAuth = remember { FirebaseAuthManager() }
+    val firebaseAuth = remember { FirebaseManager() }
     Card(
         modifier = Modifier
             .fillMaxWidth()

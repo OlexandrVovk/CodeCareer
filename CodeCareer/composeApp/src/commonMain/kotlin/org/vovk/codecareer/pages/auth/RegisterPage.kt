@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import org.vovk.codecareer.dal.firebase.FirebaseAuthManager
+import org.vovk.codecareer.dal.firebase.FirebaseManager
 
 class RegisterPage : Screen {
 
@@ -77,7 +77,7 @@ class RegisterPage : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val firebaseAuth = remember { FirebaseAuthManager() }
+        val firebaseAuth = remember { FirebaseManager() }
         var fullName by remember { mutableStateOf("") }
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }

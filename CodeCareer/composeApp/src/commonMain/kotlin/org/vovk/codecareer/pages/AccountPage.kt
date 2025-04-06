@@ -22,7 +22,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.seiko.imageloader.model.ImageAction
 import com.seiko.imageloader.rememberImageSuccessPainter
 import com.seiko.imageloader.ui.AutoSizeBox
-import org.vovk.codecareer.dal.firebase.FirebaseAuthManager
+import org.vovk.codecareer.dal.firebase.FirebaseManager
 import org.vovk.codecareer.dal.firebase.UserSessionManager
 import org.vovk.codecareer.pages.auth.LoginPage
 
@@ -32,7 +32,7 @@ class AccountPage : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val currentUser = UserSessionManager.currentUser
         println(currentUser)
-        val firebaseAuth = remember { FirebaseAuthManager() }
+        val firebaseAuth = remember { FirebaseManager() }
         
         // Redirect if not logged in
         LaunchedEffect(Unit) {
