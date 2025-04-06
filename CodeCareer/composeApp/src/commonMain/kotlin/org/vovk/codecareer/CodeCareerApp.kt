@@ -11,7 +11,8 @@ import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.browser.window
 import org.vovk.codecareer.dal.vacancies.VacanciesEntityManager
 import org.vovk.codecareer.dal.vacancies.VacanciesObject
-import org.vovk.codecareer.pages.JobSearchScreen
+import org.vovk.codecareer.pages.JobSearchPage
+import org.vovk.codecareer.pages.TracksPage
 import org.vovk.codecareer.pages.auth.LoginPage
 import org.vovk.codecareer.pages.auth.RegisterPage
 import org.vovk.codecareer.ui.navbar.CodeCareerTopAppBar
@@ -49,17 +50,20 @@ fun MainScreenWrapper() {
                     .fillMaxHeight()
                     .background(Color.White)
             ) {
-                Navigator(screen = JobSearchScreen()) { navigator: Navigator ->
+                Navigator(screen = JobSearchPage()) { navigator: Navigator ->
                     Column(modifier = Modifier.fillMaxSize()) {
                         CodeCareerTopAppBar(
                             onNavigateToJobs = {
-                                navigator.push(JobSearchScreen())
+                                navigator.push(JobSearchPage())
                             },
                             onNavigateToLogin = {
                                 navigator.push(LoginPage())
                             },
                             onNavigateToRegister = {
                                 navigator.push(RegisterPage())
+                            },
+                            onNavigateToTracks = {
+                                navigator.push(TracksPage())
                             },
                             navigator = navigator
                         )

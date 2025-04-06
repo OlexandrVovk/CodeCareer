@@ -37,6 +37,7 @@ fun CodeCareerTopAppBar(
     onNavigateToJobs: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToRegister: () -> Unit,
+    onNavigateToTracks: () -> Unit,
     isJobsActive: Boolean = true,
     navigator: Navigator
 ) {
@@ -73,6 +74,21 @@ fun CodeCareerTopAppBar(
                             fontWeight = if (isJobsActive) FontWeight.Bold else FontWeight.Normal,
                             fontSize = 16.sp
                         )
+                    }
+                    if (isLoggedIn) {
+                        Spacer(modifier = Modifier.width(32.dp))
+                        TextButton(
+                            onClick = onNavigateToTracks,
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = if (isJobsActive) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                            )
+                        ) {
+                            Text(
+                                "Tracks",
+                                fontWeight = if (isJobsActive) FontWeight.Bold else FontWeight.Normal,
+                                fontSize = 16.sp
+                            )
+                        }
                     }
             }
             Box{

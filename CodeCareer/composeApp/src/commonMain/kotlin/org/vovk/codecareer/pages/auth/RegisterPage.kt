@@ -24,9 +24,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.taktyka.c2.dal.utils.multiLangSupport.Strings
 import org.vovk.codecareer.dal.firebase.FirebaseAuthManager
-import org.vovk.codecareer.pages.JobSearchScreen
 
 class RegisterPage : Screen {
 

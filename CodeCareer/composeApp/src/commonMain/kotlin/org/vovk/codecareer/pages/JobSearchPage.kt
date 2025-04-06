@@ -17,7 +17,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import org.vovk.codecareer.ui.JobsPage
 import org.vovk.codecareer.ui.sidebar.FilterSection
 
-class JobSearchScreen: Screen {
+class JobSearchPage: Screen {
 
     @Composable
     override fun Content() {
