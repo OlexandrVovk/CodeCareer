@@ -524,6 +524,55 @@ function updateTrackedVacancy(jobUrl, status, notes, callback) {
         });
 }
 
+function deleteTrackedVacancy(jobUrl, callback) {
+    // Ensure Firebase is initialized
+    ensureInitialized()
+        .then(() => {
+            // Import Firestore
+            return import('https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js');
+        })
+        .then((firestoreModule) => {
+            // Get the current user
+            const user = auth.currentUser;
+
+            if (!user) {
+                console.error("User not authenticated");
+                callback(false);
+                return;
+            }
+
+            console.log(`Deleting vacancy for user: ${user.email}, job URL: ${jobUrl}`);
+
+            // Initialize Firestore
+            const firestore = firestoreModule.getFirestore(firebaseApp);
+
+            // Encode the job URL to make it safe for use as a document ID
+            // This replaces characters that aren't allowed in Firestore document IDs
+            const encodedJobUrl = encodeURIComponent(jobUrl).replace(/\./g, '%2E');
+
+            // Create a reference to the vacancy document
+            const vacancyRef = firestoreModule.doc(
+                firestore,
+                `users/${user.email}/tracked_vacancies/${encodedJobUrl}`
+            );
+
+            // Delete the document from Firestore
+            firestoreModule.deleteDoc(vacancyRef)
+                .then(() => {
+                    console.log("Vacancy deleted successfully");
+                    callback(true);
+                })
+                .catch((error) => {
+                    console.error("Error deleting vacancy:", error);
+                    callback(false);
+                });
+        })
+        .catch((error) => {
+            console.error("Error importing Firestore:", error);
+            callback(false);
+        });
+}
+
 
 globalThis.handleGoogleLogin = handleGoogleLogin;
 globalThis.signOut = signOut;
@@ -533,3 +582,4 @@ globalThis.addNewVacancyTrack = addNewVacancyTrack;
 globalThis.signInFromSession = signInFromSession;
 globalThis.getTrackedVacancies = getTrackedVacancies;
 globalThis.updateTrackedVacancy = updateTrackedVacancy;
+globalThis.deleteTrackedVacancy = deleteTrackedVacancy;

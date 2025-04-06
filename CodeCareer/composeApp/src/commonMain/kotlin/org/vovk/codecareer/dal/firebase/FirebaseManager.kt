@@ -23,6 +23,7 @@ external fun addNewVacancyTrack(companyName: String,
                                 callback: (String) -> Unit)
 external fun getTrackedVacancies(callback: (String) -> Unit)
 external fun updateTrackedVacancy(vacancyUrl:String, status:String, notes: String, callback: (Boolean) -> Unit)
+external fun deleteTrackedVacancy(vacancyUrl:String, callback: (Boolean) -> Unit)
 
 class FirebaseManager {
 
@@ -182,6 +183,14 @@ class FirebaseManager {
             updatedVacancy.status.toString(),
             updatedVacancy.notes
         ){response -> result = response}
+        return result
+    }
+
+    fun toDeleteTrackedVacancy(updatedVacancy: TrackedVacancy): Boolean {
+        var result: Boolean = false
+        deleteTrackedVacancy(updatedVacancy.jobInfo.jobUrl){
+            response -> result = response
+        }
         return result
     }
 }

@@ -65,8 +65,8 @@ class TracksPage : Screen {
             DeleteConfirmationDialog(
                 vacancy = vacancyToDelete!!,
                 onConfirm = {
-                    // For now, just remove from local list since we're only implementing UI
                     trackedVacancies = trackedVacancies.filter { it != vacancyToDelete }
+                    firebaseManager.toDeleteTrackedVacancy(vacancyToDelete!!)
                     vacancyToDelete = null
                     showDeleteDialog = false
                 },
