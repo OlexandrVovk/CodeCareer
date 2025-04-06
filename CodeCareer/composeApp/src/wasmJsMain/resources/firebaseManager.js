@@ -471,6 +471,59 @@ function getTrackedVacancies(callback) {
         });
 }
 
+function updateTrackedVacancy(jobUrl, status, notes, callback) {
+    ensureInitialized()
+        .then(() => {
+            return import('https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js');
+        })
+        .then((firestoreModule) => {
+            const user = auth.currentUser;
+
+            if (!user) {
+                console.error("User not authenticated");
+                callback(false);
+                return;
+            }
+
+            console.log(`Updating vacancy for user: ${user.email}, job URL: ${jobUrl}`);
+
+            // Initialize Firestore
+            const firestore = firestoreModule.getFirestore(firebaseApp);
+
+            // Encode the job URL to make it safe for use as a document ID
+            // This replaces characters that aren't allowed in Firestore document IDs
+            const encodedJobUrl = encodeURIComponent(jobUrl).replace(/\./g, '%2E');
+
+            // Create a reference to the vacancy document
+            const vacancyRef = firestoreModule.doc(
+                firestore,
+                `users/${user.email}/tracked_vacancies/${encodedJobUrl}`
+            );
+
+            // Update data
+            const updateData = {
+                trackingStatus: status,
+                notes: notes,
+                lastUpdated: firestoreModule.serverTimestamp()
+            };
+
+            // Update the document in Firestore
+            firestoreModule.updateDoc(vacancyRef, updateData)
+                .then(() => {
+                    console.log("Vacancy updated successfully");
+                    callback(true);
+                })
+                .catch((error) => {
+                    console.error("Error updating vacancy:", error);
+                    callback(false);
+                });
+        })
+        .catch((error) => {
+            console.error("Error importing Firestore:", error);
+            callback(false);
+        });
+}
+
 
 globalThis.handleGoogleLogin = handleGoogleLogin;
 globalThis.signOut = signOut;
@@ -479,3 +532,4 @@ globalThis.signInWithEmail = signInWithEmail;
 globalThis.addNewVacancyTrack = addNewVacancyTrack;
 globalThis.signInFromSession = signInFromSession;
 globalThis.getTrackedVacancies = getTrackedVacancies;
+globalThis.updateTrackedVacancy = updateTrackedVacancy;
