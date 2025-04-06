@@ -8,7 +8,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -40,6 +43,10 @@ class TracksPage : Screen {
         var isLoading by remember { mutableStateOf(true) }
         var errorMessage by remember { mutableStateOf<String?>(null) }
 
+        // State for delete confirmation dialog
+        var showDeleteDialog by remember { mutableStateOf(false) }
+        var vacancyToDelete by remember { mutableStateOf<TrackedVacancy?>(null) }
+
         // Fetch tracked vacancies when the page loads
         LaunchedEffect(Unit) {
             if (!UserSessionManager.isLoggedIn()) {
@@ -51,6 +58,23 @@ class TracksPage : Screen {
                 trackedVacancies = vacancies
                 isLoading = false
             }
+        }
+
+        // Delete confirmation dialog
+        if (showDeleteDialog && vacancyToDelete != null) {
+            DeleteConfirmationDialog(
+                vacancy = vacancyToDelete!!,
+                onConfirm = {
+                    // For now, just remove from local list since we're only implementing UI
+                    trackedVacancies = trackedVacancies.filter { it != vacancyToDelete }
+                    vacancyToDelete = null
+                    showDeleteDialog = false
+                },
+                onDismiss = {
+                    vacancyToDelete = null
+                    showDeleteDialog = false
+                }
+            )
         }
 
         Column(
@@ -133,6 +157,13 @@ class TracksPage : Screen {
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(2f)
                     )
+                    // Added column for actions
+                    Text(
+                        "Actions",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.width(50.dp),
+                        textAlign = TextAlign.Center
+                    )
                 }
 
                 // Table content
@@ -180,6 +211,10 @@ class TracksPage : Screen {
                                             it
                                         }
                                     }
+                                },
+                                onDeleteClick = {
+                                    vacancyToDelete = vacancy
+                                    showDeleteDialog = true
                                 }
                             )
                             Divider()
@@ -194,11 +229,13 @@ class TracksPage : Screen {
     fun VacancyRow(
         vacancy: TrackedVacancy,
         onStatusChange: (VacancyStatus) -> Unit,
-        onNotesChange: (String) -> Unit
+        onNotesChange: (String) -> Unit,
+        onDeleteClick: () -> Unit
     ) {
         var expanded by remember { mutableStateOf(false) }
         var editingNotes by remember { mutableStateOf(false) }
         var notesText by remember { mutableStateOf(vacancy.notes) }
+        var showMenu by remember { mutableStateOf(false) }
 
         Row(
             modifier = Modifier
@@ -358,7 +395,77 @@ class TracksPage : Screen {
                     }
                 }
             }
+
+            // Column 4: Actions (Delete button)
+            Box(
+                modifier = Modifier
+                    .width(50.dp)
+                    .padding(start = 4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                // Delete icon
+                IconButton(
+                    onClick = onDeleteClick,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = Color.Red.copy(alpha = 0.8f),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
         }
+    }
+
+    @Composable
+    fun DeleteConfirmationDialog(
+        vacancy: TrackedVacancy,
+        onConfirm: () -> Unit,
+        onDismiss: () -> Unit
+    ) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = {
+                Text("Delete Tracked Vacancy")
+            },
+            text = {
+                Column {
+                    Text("Are you sure you want to delete this vacancy from your tracking list?")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = vacancy.jobInfo.jobName,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "at ${vacancy.jobInfo.companyName}",
+                        color = Color.Gray
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "This action cannot be undone.",
+                        color = Color.Red
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = onConfirm,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.Red,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = onDismiss) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 
     private fun getStatusColor(status: VacancyStatus): Color {
