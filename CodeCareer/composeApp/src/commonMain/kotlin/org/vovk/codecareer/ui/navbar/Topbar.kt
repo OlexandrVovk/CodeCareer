@@ -2,7 +2,6 @@ package org.vovk.codecareer.ui.navbar
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -32,7 +31,7 @@ import org.vovk.codecareer.pages.AccountPage
  * @param isJobsActive Indicates if the Jobs page is the current active page to potentially highlight it.
  */
 @Composable
-fun CodeCareerTopAppBar(
+fun TopAppBar(
     modifier: Modifier = Modifier,
     onNavigateToJobs: () -> Unit,
     onNavigateToLogin: () -> Unit,
@@ -47,7 +46,7 @@ fun CodeCareerTopAppBar(
     TopAppBar(
         modifier = modifier.fillMaxWidth(),
         backgroundColor = Color(15,15,17,255),
-        elevation = 4.dp
+        elevation = 0.dp
     ) {
         Row(
             modifier = Modifier
@@ -61,36 +60,36 @@ fun CodeCareerTopAppBar(
                     text = "CodeCareer",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(199,194,200)
+                    color = Color.White
                 )
+                Spacer(modifier = Modifier.width(32.dp))
+                TextButton(
+                    onClick = onNavigateToJobs,
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = if (isJobsActive) Color(199,194,200) else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                    )
+                ) {
+                    Text(
+                        "Jobs",
+                        fontWeight = if (isJobsActive) FontWeight.Bold else FontWeight.Normal,
+                        fontSize = 16.sp
+                    )
+                }
+                if (isLoggedIn) {
                     Spacer(modifier = Modifier.width(32.dp))
                     TextButton(
-                        onClick = onNavigateToJobs,
+                        onClick = onNavigateToTracks,
                         colors = ButtonDefaults.textButtonColors(
                             contentColor = if (isJobsActive) Color(199,194,200) else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                         )
                     ) {
                         Text(
-                            "Jobs",
+                            "Tracks",
                             fontWeight = if (isJobsActive) FontWeight.Bold else FontWeight.Normal,
                             fontSize = 16.sp
                         )
                     }
-                    if (isLoggedIn) {
-                        Spacer(modifier = Modifier.width(32.dp))
-                        TextButton(
-                            onClick = onNavigateToTracks,
-                            colors = ButtonDefaults.textButtonColors(
-                                contentColor = if (isJobsActive) Color(199,194,200) else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-                            )
-                        ) {
-                            Text(
-                                "Tracks",
-                                fontWeight = if (isJobsActive) FontWeight.Bold else FontWeight.Normal,
-                                fontSize = 16.sp
-                            )
-                        }
-                    }
+                }
             }
             Box{
                 if (isLoggedIn && currentUser != null){

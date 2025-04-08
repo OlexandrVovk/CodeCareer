@@ -35,7 +35,8 @@ fun JobsPage(windowSize: Float = 0.7f) {
             text = "Вакансії: ${jobs.size}",
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
+            color = Color(199,194, 200)
         )
 
         if (jobs.isEmpty()) {

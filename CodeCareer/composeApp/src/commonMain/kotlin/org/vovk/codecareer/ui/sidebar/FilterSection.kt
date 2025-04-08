@@ -1,5 +1,7 @@
 package org.vovk.codecareer.ui.sidebar
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -7,6 +9,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -20,21 +23,32 @@ import org.vovk.codecareer.dal.filters.FilterStateManager
 fun FilterSection() {
     // Create a FilterStateManager to handle filter state
     val filterStateManager = remember { FilterStateManager() }
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(8.dp))
+        .background(Color(17,18,20,255))
+        .border(
+            width = 2.dp,
+            color = Color(17,18,20,255),
+            shape = RoundedCornerShape(8.dp)
+        )
+        .padding(25.dp)
+    ){
+        Column{
+            Text("Категорія", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(199,194,200))
+            JobCategoryFilterButtons(filterStateManager)
 
-    Column(modifier = Modifier.padding(top = 16.dp)) {
-        Text("Категорія", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        JobCategoryFilterButtons(filterStateManager)
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Text("Досвід роботи", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(199,194,200))
+            WorkingExperienceFilterButtons(filterStateManager)
 
-        Text("Досвід роботи", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        WorkingExperienceFilterButtons(filterStateManager)
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Employment", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        EmploymentFilterButtons(filterStateManager)
-        ApplyFiltersOrClear(filterStateManager)
+            Text("Employment", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(199,194,200))
+            EmploymentFilterButtons(filterStateManager)
+            ApplyFiltersOrClear(filterStateManager)
+        }
     }
 }
 
@@ -79,14 +93,22 @@ fun FilterCategoryButton(
     Button(
         onClick = onToggle,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (isSelected) Color.Green else Color.Gray
+            backgroundColor = if (isSelected) Color.Green else Color(17,18,20,255)
         ),
         shape = RoundedCornerShape(8.dp),
-        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+        modifier = Modifier
+            .border(
+                width = 2.dp,
+                color = if (isSelected) Color.White else Color(57,60,64,255),
+                shape = RoundedCornerShape(8.dp)
+            )
     ) {
         Text(
             text = text,
-            fontSize = 14.sp
+            fontSize = 14.sp,
+            color = Color(199,194,200),
+            modifier = Modifier.padding(0.dp) // Ensure text has no extra padding
         )
     }
 }

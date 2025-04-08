@@ -18,13 +18,12 @@ import org.vovk.codecareer.ui.JobsPage
 import org.vovk.codecareer.ui.sidebar.FilterSection
 
 class JobSearchPage: Screen {
-
     @Composable
     override fun Content() {
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(Color(15,15,17,255))
         ) {
             val (isFilterOverlayVisible, setFilterOverlayVisible) = remember { mutableStateOf(false) }
             val screenWidth = maxWidth
@@ -33,17 +32,11 @@ class JobSearchPage: Screen {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.White),
+                        .background(Color(15,15,17,255)),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    JobsPage(0.7f)
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .background(Color.Gray.copy(alpha = 0.2f))
-                    ) {
-                        FilterSection()
-                    }
+                    JobsPage(0.65f)
+                    FilterSection()
                 }
             }
             else {
@@ -51,7 +44,7 @@ class JobSearchPage: Screen {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.White)
+                        .background(Color(15,15,17,255))
                 ) {
                     JobsPage(1f)
                     // "Filters" button at the bottom
@@ -75,7 +68,7 @@ class JobSearchPage: Screen {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.White)
+                        .background(Color(15,15,17,255))
                 ) {
                     FilterSection()
                     // "Filters" button at the bottom

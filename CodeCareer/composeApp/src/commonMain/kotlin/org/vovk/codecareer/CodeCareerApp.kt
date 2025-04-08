@@ -15,7 +15,7 @@ import org.vovk.codecareer.pages.JobSearchPage
 import org.vovk.codecareer.pages.TracksPage
 import org.vovk.codecareer.pages.auth.LoginPage
 import org.vovk.codecareer.pages.auth.RegisterPage
-import org.vovk.codecareer.ui.navbar.CodeCareerTopAppBar
+import org.vovk.codecareer.ui.navbar.TopAppBar
 import org.w3c.dom.events.Event
 
 @Composable
@@ -50,7 +50,7 @@ fun MainScreenWrapper() {
             ) {
                 Navigator(screen = JobSearchPage()) { navigator: Navigator ->
                     Column(modifier = Modifier.fillMaxSize()) {
-                        CodeCareerTopAppBar(
+                        TopAppBar(
                             onNavigateToJobs = {
                                 navigator.push(JobSearchPage())
                             },
