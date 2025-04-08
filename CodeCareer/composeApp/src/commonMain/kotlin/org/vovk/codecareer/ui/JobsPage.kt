@@ -72,6 +72,7 @@ fun JobCard(job: JobCartEntity) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
+            backgroundColor = Color(17,18,20,255),
         elevation = 4.dp
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -83,7 +84,10 @@ fun JobCard(job: JobCartEntity) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     CircleShapeIcon(job.companyImageUrl)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(job.companyName, fontWeight = FontWeight.Bold)
+                    Text(job.companyName,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(199,194,200)
+                    )
                 }
                 if (isLoggedIn) {
                     Button(
@@ -101,13 +105,15 @@ fun JobCard(job: JobCartEntity) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .padding(top = 4.dp)
-                    .clickable { kotlinx.browser.window.open(job.jobUrl, "_blank")}
+                    .clickable { kotlinx.browser.window.open(job.jobUrl, "_blank")},
+                color = Color.White
             )
             Text(
                 text = job.jobDescription,
                 fontSize = 14.sp,
                 maxLines = 3,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                color = Color(199,194,200)
             )
         }
     }
