@@ -36,19 +36,17 @@ fun MainScreenWrapper() {
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize()
     ) {
-        val screenWidth = maxWidth
-        val isCompactScreen = screenWidth < 1024.dp
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(if (isCompactScreen) Color.White else Color.DarkGray),
+                .background(Color(15,15,17,255)),
             contentAlignment = Alignment.Center
         ) {
             Box(
                 modifier = Modifier
                     .width(1024.dp)
                     .fillMaxHeight()
-                    .background(Color.White)
+                    .background(Color(15,15,17,255))
             ) {
                 Navigator(screen = JobSearchPage()) { navigator: Navigator ->
                     Column(modifier = Modifier.fillMaxSize()) {

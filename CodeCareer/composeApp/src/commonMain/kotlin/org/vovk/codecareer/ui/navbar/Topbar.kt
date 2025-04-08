@@ -46,12 +46,13 @@ fun CodeCareerTopAppBar(
 
     TopAppBar(
         modifier = modifier.fillMaxWidth(),
-        backgroundColor = MaterialTheme.colors.surface,
-        contentColor = MaterialTheme.colors.onSurface,
+        backgroundColor = Color(15,15,17,255),
         elevation = 4.dp
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -60,13 +61,13 @@ fun CodeCareerTopAppBar(
                     text = "CodeCareer",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colors.primary
+                    color = Color(199,194,200)
                 )
                     Spacer(modifier = Modifier.width(32.dp))
                     TextButton(
                         onClick = onNavigateToJobs,
                         colors = ButtonDefaults.textButtonColors(
-                            contentColor = if (isJobsActive) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                            contentColor = if (isJobsActive) Color(199,194,200) else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                         )
                     ) {
                         Text(
@@ -80,7 +81,7 @@ fun CodeCareerTopAppBar(
                         TextButton(
                             onClick = onNavigateToTracks,
                             colors = ButtonDefaults.textButtonColors(
-                                contentColor = if (isJobsActive) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                                contentColor = if (isJobsActive) Color(199,194,200) else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                             )
                         ) {
                             Text(
@@ -96,46 +97,48 @@ fun CodeCareerTopAppBar(
                     if (currentUser.photoURL == null){
                         Box(
                             modifier = Modifier
-                                .background(Color(0xFFE0E0E0))
                                 .clickable {
                                     navigator.push(AccountPage())
                                 }
                         ) {
                             Text(
                                 text = "?",
-                                color = Color.Gray,
+                                color = Color(199,194,200),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.align(Alignment.Center)
                             )
                         }
-                    }
-                    currentUser.photoURL?.let {
-                        AutoSizeBox(it,
-                            modifier = Modifier.clickable {
-                                navigator.push(AccountPage())
-                            }.clip(CircleShape)
-                        ) { action ->
-                            when (action) {
-                                is ImageAction.Success -> {
-                                    Image(
-                                        rememberImageSuccessPainter(action),
-                                        contentDescription = "image",
-                                    )
-                                }
-                                is ImageAction.Loading -> {}
-                                is ImageAction.Failure -> {
-                                    Box(
-                                        modifier = Modifier
-                                            .background(Color(0xFFE0E0E0))
-                                    ) {
-                                        Text(
-                                            text = "?",
-                                            color = Color.Gray,
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.align(Alignment.Center)
+                    }else{
+                        Box(modifier = Modifier
+                            .padding(8.dp)){
+                            AutoSizeBox(
+                                currentUser.photoURL,
+                                modifier = Modifier
+                                    .clickable { navigator.push(AccountPage())}
+                                    .clip(CircleShape)
+                            ) { action ->
+                                when (action) {
+                                    is ImageAction.Success -> {
+                                        Image(
+                                            rememberImageSuccessPainter(action),
+                                            contentDescription = "image",
                                         )
+                                    }
+                                    is ImageAction.Loading -> {}
+                                    is ImageAction.Failure -> {
+                                        Box(
+                                            modifier = Modifier
+                                                .background(Color(0xFFE0E0E0))
+                                        ) {
+                                            Text(
+                                                text = "?",
+                                                color = Color(199,194,200),
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.align(Alignment.Center)
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -144,10 +147,12 @@ fun CodeCareerTopAppBar(
                 }else{
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = onNavigateToLogin) {
-                            Text("Login")
+                            Text("Login",
+                                color = Color(199,194,200))
                         }
                         IconButton(onClick = onNavigateToRegister) {
-                            Text("Register")
+                            Text("Register",
+                                color = Color(199,194,200))
                         }
                     }
                 }
