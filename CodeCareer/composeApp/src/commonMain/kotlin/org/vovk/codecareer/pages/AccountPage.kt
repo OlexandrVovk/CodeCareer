@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,14 +49,11 @@ class AccountPage : Screen {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { navigator.popUntilRoot() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                }
-                
                 Text(
                     text = "My Account",
                     style = MaterialTheme.typography.h6,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color(199,194,200)
                 )
             }
             
@@ -81,6 +79,8 @@ class AccountPage : Screen {
                                         Image(
                                             rememberImageSuccessPainter(action),
                                             contentDescription = "image",
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop
                                         )
                                     }
                                     is ImageAction.Loading -> {}
@@ -109,16 +109,18 @@ class AccountPage : Screen {
                     Text(
                         text = currentUser.displayName ?: "User",
                         style = MaterialTheme.typography.h5,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = Color(199,194,200)
                     )
                     
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // User name
+                    // Email name
                     Text(
-                        text = currentUser.email ?: "User",
+                        text = currentUser.email ?: "Email",
                         style = MaterialTheme.typography.h5,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = Color(199,194,200)
                     )
                     
                     Spacer(modifier = Modifier.height(32.dp))

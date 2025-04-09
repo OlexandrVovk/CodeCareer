@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,11 +33,12 @@ fun CircleShapeIcon(companyUrl: String) {
                     Image(
                         rememberImageSuccessPainter(action),
                         contentDescription = "image",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
                 }
                 is ImageAction.Loading -> {}
                 is ImageAction.Failure -> {
-                    // Failure placeholder with initials or icon
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
