@@ -1,6 +1,7 @@
 package org.vovk.codecareer.pages
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -82,17 +84,12 @@ class TracksPage : Screen {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Header with back button
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    "My Tracked Vacancies",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            Text(
+                "My Tracked Vacancies",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
             if (isLoading) {
@@ -135,92 +132,109 @@ class TracksPage : Screen {
                     }
                 }
             } else {
-                // Table header
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFEEEEEE))
-                        .padding(8.dp)
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .border(
+                        width = 1.dp,
+                        color = Color(84, 85, 86, 255),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(17,18,20,255))
+                    .padding(16.dp)
                 ) {
-                    Text(
-                        "Vacancy",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.weight(2f)
-                    )
-                    Text(
-                        "Status",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(
-                        "Notes",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.weight(2f)
-                    )
-                    // Added column for actions
-                    Text(
-                        "Actions",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.width(50.dp),
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                // Table content
-                if (trackedVacancies.isEmpty()) {
-                    Box(
+                    // Table header
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f),
-                        contentAlignment = Alignment.Center
+                            .background(Color(17,18,20,255))
+                            .padding(8.dp)
                     ) {
                         Text(
-                            "You haven't tracked any vacancies yet.\nGo to the Jobs page to start tracking!",
-                            fontSize = 16.sp,
-                            color = Color.Gray,
-                            textAlign = TextAlign.Center
+                            "Vacancy",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(2f),
+                            color = Color(199,194,200)
+                        )
+                        Text(
+                            "Status",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1f),
+                            color = Color(199,194,200)
+                        )
+                        Text(
+                            "Notes",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(2f),
+                            color = Color(199,194,200)
+                        )
+                        // Added column for actions
+                        Text(
+                            "Actions",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.width(50.dp),
+                            textAlign = TextAlign.Center,
+                            color = Color(199,194,200)
                         )
                     }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        items(trackedVacancies) { vacancy ->
-                            VacancyRow(
-                                vacancy = vacancy,
-                                onStatusChange = { newStatus ->
-                                    trackedVacancies = trackedVacancies.map {
-                                        if (it.jobInfo.jobUrl == vacancy.jobInfo.jobUrl) {
-                                            val updatedTrack = it.copy(status = newStatus)
-                                            firebaseManager.toUpdateTrackedVacancy(updatedTrack)
-                                            updatedTrack
-                                        } else {
-                                            it
-                                        }
-                                    }
-                                },
-                                onNotesChange = { newNotes ->
-                                    trackedVacancies = trackedVacancies.map {
-                                        if (it.jobInfo.jobUrl == vacancy.jobInfo.jobUrl) {
-                                            val updatedTrack = it.copy(notes = newNotes)
-                                            firebaseManager.toUpdateTrackedVacancy(updatedTrack)
-                                            updatedTrack
-                                        } else {
-                                            it
-                                        }
-                                    }
-                                },
-                                onDeleteClick = {
-                                    vacancyToDelete = vacancy
-                                    showDeleteDialog = true
-                                }
+
+                    // Table content
+                    if (trackedVacancies.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color(17,18,20,255)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                "You haven't tracked any vacancies yet.\nGo to the Jobs page to start tracking!",
+                                fontSize = 16.sp,
+                                color = Color.Gray,
+                                textAlign = TextAlign.Center
                             )
-                            Divider()
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color(17,18,20,255))
+                        ) {
+                            items(trackedVacancies) { vacancy ->
+                                VacancyRow(
+                                    vacancy = vacancy,
+                                    onStatusChange = { newStatus ->
+                                        trackedVacancies = trackedVacancies.map {
+                                            if (it.jobInfo.jobUrl == vacancy.jobInfo.jobUrl) {
+                                                val updatedTrack = it.copy(status = newStatus)
+                                                firebaseManager.toUpdateTrackedVacancy(updatedTrack)
+                                                updatedTrack
+                                            } else {
+                                                it
+                                            }
+                                        }
+                                    },
+                                    onNotesChange = { newNotes ->
+                                        trackedVacancies = trackedVacancies.map {
+                                            if (it.jobInfo.jobUrl == vacancy.jobInfo.jobUrl) {
+                                                val updatedTrack = it.copy(notes = newNotes)
+                                                firebaseManager.toUpdateTrackedVacancy(updatedTrack)
+                                                updatedTrack
+                                            } else {
+                                                it
+                                            }
+                                        }
+                                    },
+                                    onDeleteClick = {
+                                        vacancyToDelete = vacancy
+                                        showDeleteDialog = true
+                                    }
+                                )
+                                Divider()
+                            }
                         }
                     }
                 }
+
             }
         }
     }
@@ -235,7 +249,6 @@ class TracksPage : Screen {
         var expanded by remember { mutableStateOf(false) }
         var editingNotes by remember { mutableStateOf(false) }
         var notesText by remember { mutableStateOf(vacancy.notes) }
-        var showMenu by remember { mutableStateOf(false) }
 
         Row(
             modifier = Modifier
@@ -253,12 +266,13 @@ class TracksPage : Screen {
                     vacancy.jobInfo.jobName,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color(199,194,200)
                 )
                 Text(
                     "at ${vacancy.jobInfo.companyName}",
-                    color = Color.Gray,
-                    fontSize = 14.sp
+                    color = Color(199,194,200),
+                    fontSize = 14.sp,
                 )
                 Text(
                     "View Details",
@@ -267,7 +281,6 @@ class TracksPage : Screen {
                     modifier = Modifier
                         .padding(top = 4.dp)
                         .clickable {
-                            // Open job URL in new tab
                             window.open(vacancy.jobInfo.jobUrl, "_blank")
                         }
                 )
@@ -343,9 +356,14 @@ class TracksPage : Screen {
                                 .fillMaxWidth()
                                 .height(100.dp),
                             colors = TextFieldDefaults.textFieldColors(
-                                backgroundColor = Color.White
+                                backgroundColor = Color(17,18,20,255),
+                                textColor = Color(199,194,200),
+                                placeholderColor = Color(199,194,200)
                             ),
-                            placeholder = { Text("Add notes about this application...") }
+                            placeholder = {
+                                Text("Add notes about this application...",
+                                    color = Color(199,194,200))
+                            }
                         )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -374,12 +392,13 @@ class TracksPage : Screen {
                         if (vacancy.notes.isBlank()) {
                             Text(
                                 "Click to add notes...",
-                                color = Color.Gray,
+                                color = Color(199,194,200),
                                 fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                             )
                         } else {
                             Text(
                                 vacancy.notes,
+                                color = Color(199,194,200),
                                 maxLines = 3,
                                 overflow = TextOverflow.Ellipsis
                             )
