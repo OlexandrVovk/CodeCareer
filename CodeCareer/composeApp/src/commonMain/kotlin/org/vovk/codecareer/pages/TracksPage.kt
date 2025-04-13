@@ -11,18 +11,18 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -86,9 +86,9 @@ class TracksPage : Screen {
         ) {
             Text(
                 "My Tracked Vacancies",
-                fontSize = 24.sp,
+                style = MaterialTheme.typography.h6,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color(199,194,200)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -153,7 +153,7 @@ class TracksPage : Screen {
                         Text(
                             "Vacancy",
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.weight(2f),
+                            modifier = Modifier.weight(1f),
                             color = Color(199,194,200)
                         )
                         Text(
@@ -259,7 +259,7 @@ class TracksPage : Screen {
             // Column 1: Vacancy & Company
             Column(
                 modifier = Modifier
-                    .weight(2f)
+                    .weight(1f)
                     .padding(end = 8.dp)
             ) {
                 Text(
@@ -276,7 +276,7 @@ class TracksPage : Screen {
                 )
                 Text(
                     "View Details",
-                    color = MaterialTheme.colors.primary,
+                    color = Color(0xFF864AED),
                     fontSize = 12.sp,
                     modifier = Modifier
                         .padding(top = 4.dp)
@@ -292,11 +292,17 @@ class TracksPage : Screen {
                     .weight(1f)
                     .padding(horizontal = 4.dp)
             ) {
+                var buttonWidth by remember { mutableStateOf(0) }
+
                 OutlinedButton(
                     onClick = { expanded = true },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onGloballyPositioned { coordinates ->
+                            buttonWidth = coordinates.size.width
+                        },
                     colors = ButtonDefaults.outlinedButtonColors(
-                        backgroundColor = getStatusColor(vacancy.status).copy(alpha = 0.1f)
+                        backgroundColor = getStatusColor(vacancy.status).copy(alpha = 0.3f)
                     )
                 ) {
                     Text(
@@ -311,11 +317,12 @@ class TracksPage : Screen {
                         tint = getStatusColor(vacancy.status)
                     )
                 }
-
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    modifier = Modifier.width(200.dp)
+                    modifier = Modifier
+                        .width(with(LocalDensity.current) { buttonWidth.toDp() })
+                        .background(Color(199,194,200))
                 ) {
                     VacancyStatus.entries.forEach { status ->
                         DropdownMenuItem(
@@ -491,7 +498,7 @@ class TracksPage : Screen {
         return when (status) {
             VacancyStatus.INTERESTED -> Color(0xFF2196F3)      // Blue
             VacancyStatus.RESUME_SENT -> Color(0xFFFF9800)     // Orange
-            VacancyStatus.INTERVIEW_SCHEDULED -> Color(0xFF673AB7) // Purple
+            VacancyStatus.INTERVIEW_SCHEDULED -> Color(0xFF864AED) // Purple
             VacancyStatus.OFFER -> Color(0xFF4CAF50)           // Green
             VacancyStatus.REJECTED -> Color(0xFFF44336)        // Red
             VacancyStatus.NOT_INTERESTED -> Color(0xFF9E9E9E)  // Gray
