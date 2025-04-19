@@ -9,5 +9,6 @@ enum class JobCategory {
     PHP,
     `.NET`,
     RUBY,
-    SWIFT
+    IOS,
+    ANDROID
 }

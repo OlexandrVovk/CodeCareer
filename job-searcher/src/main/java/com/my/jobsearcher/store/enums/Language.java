@@ -12,7 +12,9 @@ public enum Language {
     PHP("PHP"),
     JAVASCRIPT("JavaScript"),
     SWIFT("Swift"),
-    DOT_NET(".NET");
+    DOT_NET(".NET"),
+    IOS("IOS"),
+    ANDROID("Android");
 
     private final String displayName;
     private static final Map<String, Language> NAME_MAP = new HashMap<>();
