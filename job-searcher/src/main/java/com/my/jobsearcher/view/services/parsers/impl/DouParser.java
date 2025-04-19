@@ -11,6 +11,8 @@ import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +40,7 @@ public class DouParser implements Parser {
         }
 
         String url = "https://jobs.dou.ua/vacancies/?search="
-                + vacancyRequest.getLang().toString().toLowerCase()
+                + URLEncoder.encode(vacancyRequest.getLang().toString().toUpperCase(), StandardCharsets.UTF_8)
                 + "&" + expLvl;
         try {
             Document document = Jsoup.connect(url)
@@ -97,9 +99,6 @@ public class DouParser implements Parser {
         return vacancies;
     }
 
-    /**
-     * Simple helper to decide if a vacancy's city text matches your required Employment.
-     */
     private boolean shouldIncludeVacancy(String cityText, Employment emp) {
         return switch (emp) {
             case REMOTE -> cityText.toLowerCase().contains("віддалено");

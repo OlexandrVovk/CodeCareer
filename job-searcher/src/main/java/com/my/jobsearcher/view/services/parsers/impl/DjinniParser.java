@@ -10,6 +10,8 @@ import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class DjinniParser implements Parser {
 
         String url = "https://djinni.co/jobs/?"
                 + "all-keywords=&any-of-keywords=&exclude-keywords=&primary_keyword="
-                + vacancyRequest.getLang().toString().toLowerCase()
+                + URLEncoder.encode(vacancyRequest.getLang().toString().toUpperCase(), StandardCharsets.UTF_8)
                 + "&" + expLvl
                 + "&" + employment;
 
