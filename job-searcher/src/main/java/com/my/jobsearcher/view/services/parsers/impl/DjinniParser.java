@@ -41,7 +41,7 @@ public class DjinniParser implements Parser {
 
         String url = "https://djinni.co/jobs/?"
                 + "all-keywords=&any-of-keywords=&exclude-keywords=&primary_keyword="
-                + URLEncoder.encode(vacancyRequest.getLang().toString().toUpperCase(), StandardCharsets.UTF_8)
+                + URLEncoder.encode(vacancyRequest.getLang().toString(), StandardCharsets.UTF_8)
                 + "&" + expLvl
                 + "&" + employment;
 

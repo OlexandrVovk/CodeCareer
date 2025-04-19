@@ -40,7 +40,7 @@ public class DouParser implements Parser {
         }
 
         String url = "https://jobs.dou.ua/vacancies/?search="
-                + URLEncoder.encode(vacancyRequest.getLang().toString().toUpperCase(), StandardCharsets.UTF_8)
+                + URLEncoder.encode(vacancyRequest.getLang().toString(), StandardCharsets.UTF_8)
                 + "&" + expLvl;
         try {
             Document document = Jsoup.connect(url)
