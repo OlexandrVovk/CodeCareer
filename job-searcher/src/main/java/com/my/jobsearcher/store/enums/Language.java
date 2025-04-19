@@ -12,7 +12,6 @@ public enum Language {
     KOTLIN("Kotlin"),
     PHP("PHP"),
     JAVASCRIPT("JavaScript"),
-    TYPESCRIPT("TypeScript"),
     SWIFT("Swift"),
     DOT_NET(".NET");
 

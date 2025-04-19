@@ -6,7 +6,7 @@ enum class JobCategory {
     C,
     PYTHON,
     `C++`,
-    `Front-End`,
+    JAVASCRIPT,
     PHP,
     `.NET`,
     RUBY,
