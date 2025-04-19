@@ -37,7 +37,7 @@ public class MainController {
         }
         List<VacancyRequest> vacancyRequests = new ArrayList<>();
         for (String lan : langs) {
-            Language language = Language.valueOf(lan.toUpperCase());
+            Language language = Language.fromString(lan);
             for (String exp : exps) {
                 Experience experience = Experience.valueOf(exp.toUpperCase());
                 for (String emp : emps) {

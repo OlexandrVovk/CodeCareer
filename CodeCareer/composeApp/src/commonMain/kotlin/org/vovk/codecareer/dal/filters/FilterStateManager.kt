@@ -2,11 +2,12 @@ package org.vovk.codecareer.dal.filters
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.unit.dp
 import org.vovk.codecareer.dal.entities.FilterDataEntity
 import org.vovk.codecareer.dal.enums.EmploymentType
 import org.vovk.codecareer.dal.enums.JobCategory
 import org.vovk.codecareer.dal.enums.WorkingExperience
+import kotlin.collections.joinToString
+import kotlinx.serialization.json.Json
 
 external fun sendRequest(text: String) : String
 
@@ -71,31 +72,23 @@ class FilterStateManager {
 
     fun applyFilters() {
         val filterDataEntity = getFilterDataEntity()
-        val queryParams = mutableListOf<String>()
+        val params = mutableMapOf<String, String>()
 
         if (filterDataEntity.categories.isNotEmpty()) {
-            val languages = filterDataEntity.categories.joinToString(separator = ",") {
-                it.name.lowercase()
-            }
-            queryParams.add("language=$languages")
+            val languages = filterDataEntity.categories.joinToString(separator = ",") { it.name.lowercase() }
+            params["language"] = languages
         }
 
         if (filterDataEntity.experiences.isNotEmpty()) {
-            val experiences = filterDataEntity.experiences.joinToString(separator = ",") {
-                it.name.lowercase()
-            }
-            queryParams.add("exp=$experiences")
+            val experiences = filterDataEntity.experiences.joinToString(separator = ",") { it.name.lowercase() }
+            params["exp"] = experiences
         }
 
         if (filterDataEntity.employmentTypes.isNotEmpty()) {
-            val employments = filterDataEntity.employmentTypes.joinToString(separator = ",") {
-                it.name.lowercase().replace(" ", "")
-            }
-            queryParams.add("employment=$employments")
+            val employments = filterDataEntity.employmentTypes.joinToString(separator = ",") { it.name.lowercase().replace(" ", "") }
+            params["employment"] = employments
         }
-
-        val fullUrl = vacancyServiceUrl + queryParams.joinToString("&")
-        sendRequest(fullUrl)
+        sendRequest(Json.encodeToString(params))
     }
 
     fun clearAllFilters() {

@@ -2,10 +2,13 @@ package org.vovk.codecareer.dal.enums
 
 enum class JobCategory {
     JAVA,
+    KOTLIN,
     C,
     PYTHON,
     `C++`,
-    `Frontend`,
+    `Front-End`,
     PHP,
-    `C#`
+    `.NET`,
+    RUBY,
+    SWIFT
 }
