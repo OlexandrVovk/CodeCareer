@@ -5,7 +5,6 @@ import java.util.Map;
 
 public enum Language {
     PYTHON("Python"),
-    C("C"),
     C_PLUS_PLUS("C++"),
     RUBY("Ruby"),
     JAVA("Java"),
