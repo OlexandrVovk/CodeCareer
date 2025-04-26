@@ -24,6 +24,8 @@ import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -95,10 +97,10 @@ fun CalendarDialog(
                             Text("June 2023", fontWeight = FontWeight.Bold)
                             Row {
                                 IconButton(onClick = { /* Previous month */ }) {
-                                    Text("←")
+                                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous month")
                                 }
                                 IconButton(onClick = { /* Next month */ }) {
-                                    Text("→")
+                                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next month")
                                 }
                             }
                         }
