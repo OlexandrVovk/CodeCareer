@@ -42,7 +42,7 @@ import org.vovk.codecareer.dal.entities.VacancyStatus
 import org.vovk.codecareer.dal.firebase.FirebaseManager
 import org.vovk.codecareer.dal.firebase.UserSessionManager
 import org.vovk.codecareer.pages.auth.LoginPage
-import org.vovk.codecareer.ui.tracks.CalendarDialog
+import org.vovk.codecareer.ui.calendar.CalendarDialog
 
 class TracksPage : Screen {
 
