@@ -17,6 +17,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +42,7 @@ import org.vovk.codecareer.dal.entities.VacancyStatus
 import org.vovk.codecareer.dal.firebase.FirebaseManager
 import org.vovk.codecareer.dal.firebase.UserSessionManager
 import org.vovk.codecareer.pages.auth.LoginPage
+import org.vovk.codecareer.ui.tracks.CalendarDialog
 
 class TracksPage : Screen {
 
@@ -57,6 +60,10 @@ class TracksPage : Screen {
         // State for delete confirmation dialog
         var showDeleteDialog by remember { mutableStateOf(false) }
         var vacancyToDelete by remember { mutableStateOf<TrackedVacancy?>(null) }
+
+        // State for calendar dialog
+        var showCalendarDialog by remember { mutableStateOf(false) }
+        var vacancyToSchedule by remember { mutableStateOf<TrackedVacancy?>(null) }
 
         // Screen width detection for responsive layout
         var screenWidth by remember { mutableStateOf(0.dp) }
@@ -93,6 +100,22 @@ class TracksPage : Screen {
                 onDismiss = {
                     vacancyToDelete = null
                     showDeleteDialog = false
+                }
+            )
+        }
+
+        // Calendar dialog
+        if (showCalendarDialog && vacancyToSchedule != null) {
+            CalendarDialog(
+                vacancy = vacancyToSchedule!!,
+                onConfirm = {
+                    // Mock implementation - no business logic as per requirements
+                    vacancyToSchedule = null
+                    showCalendarDialog = false
+                },
+                onDismiss = {
+                    vacancyToSchedule = null
+                    showCalendarDialog = false
                 }
             )
         }
@@ -229,6 +252,10 @@ class TracksPage : Screen {
                                         onDeleteClick = {
                                             vacancyToDelete = vacancy
                                             showDeleteDialog = true
+                                        },
+                                        onCalendarClick = {
+                                            vacancyToSchedule = vacancy
+                                            showCalendarDialog = true
                                         }
                                     )
                                     Divider()
@@ -373,7 +400,8 @@ class TracksPage : Screen {
         vacancy: TrackedVacancy,
         onStatusChange: (VacancyStatus) -> Unit,
         onNotesChange: (String) -> Unit,
-        onDeleteClick: () -> Unit
+        onDeleteClick: () -> Unit,
+        onCalendarClick: () -> Unit
     ) {
         var expanded by remember { mutableStateOf(false) }
         var editingNotes by remember { mutableStateOf(false) }
@@ -551,24 +579,70 @@ class TracksPage : Screen {
                 }
             }
 
-            // Column 4: Actions (Delete button)
+            // Column 4: Actions (Three-dot menu)
             Box(
                 modifier = Modifier
                     .width(50.dp)
                     .padding(start = 4.dp),
                 contentAlignment = Alignment.Center
             ) {
-                // Delete icon
+                // Three-dot menu
+                var showMenu by remember { mutableStateOf(false) }
+
                 IconButton(
-                    onClick = onDeleteClick,
+                    onClick = { showMenu = true },
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = Color.Red.copy(alpha = 0.8f),
+                        Icons.Default.MoreVert,
+                        contentDescription = "More Options",
+                        tint = Color(199,194,200),
                         modifier = Modifier.size(20.dp)
                     )
+                }
+
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false },
+                    modifier = Modifier.background(Color(30, 31, 34, 255))
+                ) {
+                    // Delete option
+                    DropdownMenuItem(
+                        onClick = {
+                            onDeleteClick()
+                            showMenu = false
+                        }
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = Color.Red.copy(alpha = 0.8f),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Delete", color = Color(199,194,200))
+                        }
+                    }
+
+                    // Calendar option
+                    DropdownMenuItem(
+                        onClick = {
+                            onCalendarClick()
+                            showMenu = false
+                        }
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.DateRange,
+                                contentDescription = "Calendar",
+                                tint = Color(0xFF864AED),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Calendar", color = Color(199,194,200))
+                        }
+                    }
                 }
             }
         }
