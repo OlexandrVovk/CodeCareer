@@ -1,6 +1,7 @@
 package org.vovk.codecareer.ui.calendar
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,12 +16,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
+import org.vovk.codecareer.dal.enums.InterviewType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,7 +48,8 @@ fun CalendarDialog(
 ) {
     val todaysDate = getTodaysDate()
     var selectedDate by remember { mutableStateOf(todaysDate) }
-    var eventTitle by remember { mutableStateOf("") }
+    var selectedInterviewType by remember { mutableStateOf<InterviewType?>(null) }
+    var isDropdownExpanded by remember { mutableStateOf(false) }
     var eventTime by remember { mutableStateOf("") }
     var eventNotes by remember { mutableStateOf("") }
 
@@ -104,13 +110,44 @@ fun CalendarDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Event details
-                OutlinedTextField(
-                    value = eventTitle,
-                    onValueChange = { eventTitle = it },
-                    label = { Text("Event Title") },
-                    placeholder = { Text("e.g., Interview with HR") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                // Dropdown for interview types
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedButton(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        onClick = { isDropdownExpanded = true }
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = selectedInterviewType?.displayName ?: "Select interview type",
+                                modifier = Modifier.weight(1f)
+                            )
+                            Icon(
+                                Icons.Default.ArrowDropDown,
+                                contentDescription = "Dropdown"
+                            )
+                        }
+                    }
+
+                    DropdownMenu(
+                        expanded = isDropdownExpanded,
+                        onDismissRequest = { isDropdownExpanded = false },
+                    ) {
+                        InterviewType.entries.forEach { interviewType ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    selectedInterviewType = interviewType
+                                    isDropdownExpanded = false
+                                }
+                            ) {
+                                Text(interviewType.displayName)
+                            }
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
