@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -50,8 +51,16 @@ fun CalendarDialog(
     var selectedDate by remember { mutableStateOf(todaysDate) }
     var selectedInterviewType by remember { mutableStateOf<InterviewType?>(null) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
-    var eventTime by remember { mutableStateOf("") }
+    var eventHours by remember { mutableStateOf(9) } // Default to 9:00 AM
+    var eventMinutes by remember { mutableStateOf(0) }
     var eventNotes by remember { mutableStateOf("") }
+
+    // Format time as HH:MM for display and saving
+    val formattedTime = remember(eventHours, eventMinutes) {
+        val hours = eventHours.toString().padStart(2, '0')
+        val minutes = eventMinutes.toString().padStart(2, '0')
+        "$hours:$minutes"
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -151,13 +160,17 @@ fun CalendarDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                OutlinedTextField(
-                    value = eventTime,
-                    onValueChange = { eventTime = it },
-                    label = { Text("Time") },
-                    placeholder = { Text("e.g., 14:30") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                // Time selector component
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text("Select time", modifier = Modifier.padding(bottom = 4.dp))
+                    TimeSelector(
+                        hours = eventHours,
+                        minutes = eventMinutes,
+                        onHoursChange = { eventHours = it },
+                        onMinutesChange = { eventMinutes = it },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -173,7 +186,7 @@ fun CalendarDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    "Selected date: $selectedDate",
+                    "Selected date: $selectedDate at $formattedTime",
                     color = Color(0xFF864AED),
                     fontWeight = FontWeight.Bold
                 )
