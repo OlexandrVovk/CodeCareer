@@ -1,12 +1,13 @@
 package org.vovk.codecareer.dal.firebase
 
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.vovk.codecareer.dal.entities.JobCartEntity
 import org.vovk.codecareer.dal.entities.TrackedVacancy
-import org.vovk.codecareer.dal.entities.VacancyStatus
+import org.vovk.codecareer.dal.enums.VacancyStatus
 
 // Auth JS functions declaration
 external fun createUserWithEmail(email: String, password: String, displayName: String, callback: (String) -> Unit)
@@ -24,6 +25,7 @@ external fun addNewVacancyTrack(companyName: String,
 external fun getTrackedVacancies(callback: (String) -> Unit)
 external fun updateTrackedVacancy(vacancyUrl:String, status:String, notes: String, callback: (Boolean) -> Unit)
 external fun deleteTrackedVacancy(vacancyUrl:String, callback: (Boolean) -> Unit)
+external fun scheduleInterview(vacancyUrl:String, dateAndTime: String, type: String, notes: String, callback: (Boolean) -> Unit)
 
 class FirebaseManager {
 
@@ -107,7 +109,7 @@ class FirebaseManager {
         getTrackedVacancies { response ->
             try {
                 // Parse the JSON response
-                val jsonObject = kotlinx.serialization.json.Json.parseToJsonElement(response).jsonObject
+                val jsonObject = Json.parseToJsonElement(response).jsonObject
 
                 // Check if the request was successful
                 val isSuccess = jsonObject["success"]?.jsonPrimitive?.boolean ?: false
@@ -143,11 +145,35 @@ class FirebaseManager {
 
                                     val notes = vacancyObj["notes"]?.jsonPrimitive?.content ?: ""
 
+                                    // Parse interview schedule if present
+                                    val interviewScheduleObj = vacancyObj["interviewSchedule"]?.jsonObject
+                                    val interviewSchedule = if (interviewScheduleObj != null) {
+                                        val date = interviewScheduleObj["date"]?.jsonPrimitive?.content ?: ""
+                                        val time = interviewScheduleObj["time"]?.jsonPrimitive?.content ?: ""
+                                        val typeString = interviewScheduleObj["type"]?.jsonPrimitive?.content
+                                        val type = try {
+                                            typeString?.let { org.vovk.codecareer.dal.enums.InterviewType.valueOf(it) }
+                                        } catch (e: IllegalArgumentException) {
+                                            null
+                                        }
+                                        val interviewNotes = interviewScheduleObj["notes"]?.jsonPrimitive?.content ?: ""
+
+                                        org.vovk.codecareer.dal.entities.InterviewSchedule(
+                                            date = date,
+                                            time = time,
+                                            type = type,
+                                            notes = interviewNotes
+                                        )
+                                    } else {
+                                        null
+                                    }
+
                                     // Create TrackedVacancy object
                                     TrackedVacancy(
                                         jobInfo = jobCartEntity,
                                         status = status,
-                                        notes = notes
+                                        notes = notes,
+                                        interviewSchedule = interviewSchedule
                                     )
                                 } else {
                                     null
@@ -178,10 +204,22 @@ class FirebaseManager {
     }
 
     fun toUpdateTrackedVacancy(updatedVacancy: TrackedVacancy): Boolean {
-        var result: Boolean = false
+        var result = false
         updateTrackedVacancy(updatedVacancy.jobInfo.jobUrl,
             updatedVacancy.status.toString(),
             updatedVacancy.notes
+        ){response -> result = response}
+        return result
+    }
+
+    fun toScheduleInterview(updatedVacancy: TrackedVacancy): Boolean {
+        var result = false
+        val dateAndTime = updatedVacancy.interviewSchedule!!.date + "_" + updatedVacancy.interviewSchedule!!.time
+        scheduleInterview(
+            vacancyUrl = updatedVacancy.jobInfo.jobUrl,
+            dateAndTime = dateAndTime,
+            type = updatedVacancy.interviewSchedule!!.type.toString(),
+            notes = updatedVacancy.interviewSchedule!!.notes,
         ){response -> result = response}
         return result
     }

@@ -38,7 +38,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.vovk.codecareer.dal.entities.TrackedVacancy
-import org.vovk.codecareer.dal.entities.VacancyStatus
+import org.vovk.codecareer.dal.enums.VacancyStatus
 import org.vovk.codecareer.dal.firebase.FirebaseManager
 import org.vovk.codecareer.dal.firebase.UserSessionManager
 import org.vovk.codecareer.pages.auth.LoginPage
@@ -108,8 +108,15 @@ class TracksPage : Screen {
         if (showCalendarDialog && vacancyToSchedule != null) {
             CalendarDialog(
                 vacancy = vacancyToSchedule!!,
-                onConfirm = {
-                    // Mock implementation - no business logic as per requirements
+                onConfirm = { updatedVacancy ->
+                    // Update the vacancy with the interview schedule
+                    vacancyToSchedule = updatedVacancy
+                    // Schedule the interview in Firebase
+                    firebaseManager.toScheduleInterview(updatedVacancy)
+                    // Update the local list of vacancies
+                    trackedVacancies = trackedVacancies.map { 
+                        if (it.jobInfo.jobUrl == updatedVacancy.jobInfo.jobUrl) updatedVacancy else it 
+                    }
                     vacancyToSchedule = null
                     showCalendarDialog = false
                 },

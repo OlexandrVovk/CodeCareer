@@ -573,6 +573,65 @@ function deleteTrackedVacancy(jobUrl, callback) {
         });
 }
 
+function scheduleInterview(jobUrl, dateAndTime, type, notes, callback) {
+    // Ensure Firebase is initialized
+    ensureInitialized()
+        .then(() => {
+            // Import Firestore
+            return import('https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js');
+        })
+        .then((firestoreModule) => {
+            // Get the current user
+            const user = auth.currentUser;
+
+            if (!user) {
+                console.error("User not authenticated");
+                callback(false);
+                return;
+            }
+
+            // Initialize Firestore
+            const firestore = firestoreModule.getFirestore(firebaseApp);
+            const encodedJobUrl = encodeURIComponent(jobUrl).replace(/\./g, '%2E');
+            const vacancyRef = firestoreModule.doc(
+                firestore,
+                `users/${user.email}/tracked_vacancies/${encodedJobUrl}`
+            );
+
+            // Parse date and time
+            const [date, time] = dateAndTime.split('_');
+
+            // Create interview schedule object
+            const interviewSchedule = {
+                date: date,
+                time: time,
+                type: type,
+                notes: notes
+            };
+
+            // Update data with interview schedule
+            const updateData = {
+                interviewSchedule: interviewSchedule,
+                lastUpdated: firestoreModule.serverTimestamp()
+            };
+
+            // Update the document in Firestore
+            firestoreModule.updateDoc(vacancyRef, updateData)
+                .then(() => {
+                    console.log("Interview scheduled successfully");
+                    callback(true);
+                })
+                .catch((error) => {
+                    console.error("Error scheduling interview:", error);
+                    callback(false);
+                });
+        })
+        .catch((error) => {
+            console.error("Error importing Firestore:", error);
+            callback(false);
+        });
+}
+
 
 globalThis.handleGoogleLogin = handleGoogleLogin;
 globalThis.signOut = signOut;
@@ -583,3 +642,4 @@ globalThis.signInFromSession = signInFromSession;
 globalThis.getTrackedVacancies = getTrackedVacancies;
 globalThis.updateTrackedVacancy = updateTrackedVacancy;
 globalThis.deleteTrackedVacancy = deleteTrackedVacancy;
+globalThis.scheduleInterview = scheduleInterview;

@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.vovk.codecareer.dal.entities.InterviewSchedule
 import org.vovk.codecareer.dal.entities.TrackedVacancy
 
 external fun getTodaysDate(): String
@@ -44,7 +45,7 @@ external fun getTodaysDate(): String
 @Composable
 fun CalendarDialog(
     vacancy: TrackedVacancy,
-    onConfirm: () -> Unit,
+    onConfirm: (TrackedVacancy) -> Unit,
     onDismiss: () -> Unit
 ) {
     val todaysDate = getTodaysDate()
@@ -54,6 +55,7 @@ fun CalendarDialog(
     var eventHours by remember { mutableStateOf(9) } // Default to 9:00 AM
     var eventMinutes by remember { mutableStateOf(0) }
     var eventNotes by remember { mutableStateOf("") }
+    var showInterviewTypeWarning by remember { mutableStateOf(false) }
 
     // Format time as HH:MM for display and saving
     val formattedTime = remember(eventHours, eventMinutes) {
@@ -150,12 +152,23 @@ fun CalendarDialog(
                                 onClick = {
                                     selectedInterviewType = interviewType
                                     isDropdownExpanded = false
+                                    // Hide warning when an interview type is selected
+                                    showInterviewTypeWarning = false
                                 }
                             ) {
                                 Text(interviewType.displayName)
                             }
                         }
                     }
+                }
+
+                // Show warning if user tried to submit without selecting an interview type
+                if (showInterviewTypeWarning) {
+                    Text(
+                        text = "Please select an interview type",
+                        color = Color.Red,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -194,7 +207,29 @@ fun CalendarDialog(
         },
         confirmButton = {
             Button(
-                onClick = onConfirm,
+                onClick = {
+                    // Check if interview type is selected
+                    if (selectedInterviewType == null) {
+                        // Show warning if no interview type is selected
+                        showInterviewTypeWarning = true
+                    } else {
+                        // Create the interview schedule
+                        val interviewSchedule = InterviewSchedule(
+                            date = selectedDate,
+                            time = formattedTime,
+                            type = selectedInterviewType,
+                            notes = eventNotes
+                        )
+
+                        // Update the vacancy with the interview schedule
+                        val updatedVacancy = vacancy.copy(
+                            interviewSchedule = interviewSchedule
+                        )
+
+                        // Call onConfirm with the updated vacancy
+                        onConfirm(updatedVacancy)
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(0xFF864AED),
                     contentColor = Color.White
