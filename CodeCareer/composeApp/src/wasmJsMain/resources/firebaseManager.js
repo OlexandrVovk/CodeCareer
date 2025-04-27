@@ -439,7 +439,8 @@ function getTrackedVacancies(callback) {
                                 jobUrl: data.jobUrl
                             },
                             status: data.trackingStatus || "INTERESTED",
-                            notes: data.notes || ""
+                            notes: data.notes || "",
+                            interviewSchedule: data.interviewSchedule || null
                         });
                     });
 

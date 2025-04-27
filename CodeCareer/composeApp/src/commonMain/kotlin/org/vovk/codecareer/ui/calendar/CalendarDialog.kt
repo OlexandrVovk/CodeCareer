@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import org.vovk.codecareer.dal.enums.InterviewType
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,11 +50,26 @@ fun CalendarDialog(
     onDismiss: () -> Unit
 ) {
     val todaysDate = getTodaysDate()
-    var selectedDate by remember { mutableStateOf(todaysDate) }
+
+    // Get existing interview schedule data if available
+    val existingSchedule = vacancy.interviewSchedule
+
+    // Initialize form fields with existing data or defaults
+    var selectedDate by remember {
+        mutableStateOf(todaysDate)
+    }
     var selectedInterviewType by remember { mutableStateOf<InterviewType?>(null) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
-    var eventHours by remember { mutableStateOf(9) } // Default to 9:00 AM
-    var eventMinutes by remember { mutableStateOf(0) }
+
+    // Initialize time from existing schedule or default to 9:00 AM
+    var eventHours by remember { 
+        val hours = 9
+        mutableStateOf(hours) 
+    }
+    var eventMinutes by remember { 
+        val minutes = 0
+        mutableStateOf(minutes) 
+    }
     var eventNotes by remember { mutableStateOf("") }
     var showInterviewTypeWarning by remember { mutableStateOf(false) }
 
@@ -62,6 +78,25 @@ fun CalendarDialog(
         val hours = eventHours.toString().padStart(2, '0')
         val minutes = eventMinutes.toString().padStart(2, '0')
         "$hours:$minutes"
+    }
+
+    // Effect to populate form fields when a scheduled date is selected
+    LaunchedEffect(selectedDate) {
+        // Check if the selected date matches the scheduled date
+        if (existingSchedule != null && selectedDate == existingSchedule.date) {
+            // Parse time from the scheduled date (format: "HH:MM")
+            val timeParts = existingSchedule.time.split(":")
+            if (timeParts.size == 2) {
+                eventHours = timeParts[0].toIntOrNull() ?: 9
+                eventMinutes = timeParts[1].toIntOrNull() ?: 0
+            }
+
+            // Set interview type from the scheduled date
+            selectedInterviewType = existingSchedule.type
+
+            // Set notes from the scheduled date
+            eventNotes = existingSchedule.notes
+        }
     }
 
     AlertDialog(
@@ -107,6 +142,9 @@ fun CalendarDialog(
                         CalendarDate.now()
                     }
 
+                    // Create a list of scheduled dates
+                    val scheduledDates = listOfNotNull(vacancy.interviewSchedule?.date).filter { it.isNotEmpty() }
+
                     // Use our custom calendar component
                     CustomCalendar(
                         initialDate = initialDate,
@@ -114,6 +152,7 @@ fun CalendarDialog(
                             selectedDate = date.format()
                         },
                         accentColor = Color(0xFF864AED),
+                        scheduledDates = scheduledDates,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -235,7 +274,7 @@ fun CalendarDialog(
                     contentColor = Color.White
                 )
             ) {
-                Text("Save Event")
+                Text(if (vacancy.interviewSchedule != null) "Update Event" else "Save Event")
             }
         },
         dismissButton = {
