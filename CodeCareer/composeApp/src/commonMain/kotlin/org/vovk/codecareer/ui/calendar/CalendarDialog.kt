@@ -1,13 +1,6 @@
 package org.vovk.codecareer.ui.calendar
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -46,7 +38,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.vovk.codecareer.dal.entities.InterviewSchedule
@@ -244,19 +235,14 @@ fun CalendarDialog(
                 // Time Selection Step
                 if (currentStep == CalendarStep.TIME_SELECTION) {
                     Column {
-                    // Time selector component with back button
-                    TimeSelector(
-                        hours = eventHours,
-                        minutes = eventMinutes,
-                        onHoursChange = {
+                    // Hour-based time selector component
+                    HourlyTimeSelector(
+                        selectedHour = eventHours,
+                        hourlyEvents = emptyMap(),
+                        onHourSelected = {
                             eventHours = it
                             showPastTimeError = false // Reset error when time changes
                         },
-                        onMinutesChange = {
-                            eventMinutes = it
-                            showPastTimeError = false // Reset error when time changes
-                        },
-                        onBackClick = { currentStep = CalendarStep.DATE_SELECTION },
                         modifier = Modifier.fillMaxWidth()
                     )
 
