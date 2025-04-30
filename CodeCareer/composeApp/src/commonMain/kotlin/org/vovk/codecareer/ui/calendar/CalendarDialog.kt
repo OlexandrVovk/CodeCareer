@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -66,13 +63,13 @@ fun CalendarDialog(
     var isDropdownExpanded by remember { mutableStateOf(false) }
 
     // Initialize time from existing schedule or default to 9:00 AM
-    var eventHours by remember { 
+    var eventHours by remember {
         val hours = 9
-        mutableStateOf(hours) 
+        mutableStateOf(hours)
     }
-    var eventMinutes by remember { 
+    var eventMinutes by remember {
         val minutes = 0
-        mutableStateOf(minutes) 
+        mutableStateOf(minutes)
     }
     var eventNotes by remember { mutableStateOf("") }
     var showInterviewTypeWarning by remember { mutableStateOf(false) }
@@ -104,6 +101,31 @@ fun CalendarDialog(
 
             // Set notes from the scheduled date
             eventNotes = existingSchedule.notes
+        }
+    }
+
+    // Function to handle save/update event
+    val handleConfirm = {
+        // Check if interview type is selected
+        if (selectedInterviewType == null) {
+            // Show warning if no interview type is selected
+            showInterviewTypeWarning = true
+        } else {
+            // Create the interview schedule
+            val interviewSchedule = InterviewSchedule(
+                date = selectedDate,
+                time = formattedTime,
+                type = selectedInterviewType,
+                notes = eventNotes
+            )
+
+            // Update the vacancy with the interview schedule
+            val updatedVacancy = vacancy.copy(
+                interviewSchedule = interviewSchedule
+            )
+
+            // Call onConfirm with the updated vacancy
+            onConfirm(updatedVacancy)
         }
     }
 
@@ -144,27 +166,34 @@ fun CalendarDialog(
                 if (currentStep == CalendarStep.DATE_SELECTION) {
                     DateSelectionStep(
                         vacancy = vacancy,
-                        selectedDate = selectedDate,
+                        currentDate = selectedDate,
                         accentColor = accentColor,
                         errorColor = errorColor,
                         showPastDateError = showPastDateError,
                         onDateSelected = { date ->
                             selectedDate = date
                             showPastDateError = false
+                            // Automatically advance to next step after date selection
+                            currentStep = CalendarStep.TIME_SELECTION
                         },
+                        onCancel = onDismiss
                     )
                 }
 
                 // Time Selection Step
                 if (currentStep == CalendarStep.TIME_SELECTION) {
                     TimeSelectionStep(
-                        selectedHour = eventHours,
+                        startingHour = eventHours,
                         showPastTimeError = showPastTimeError,
                         errorColor = errorColor,
                         onHourSelected = {
                             eventHours = it
                             showPastTimeError = false
-                        }
+                            // Automatically advance to next step after time selection
+                            currentStep = CalendarStep.EVENT_SUMMARY
+                        },
+                        onBack = { currentStep = CalendarStep.DATE_SELECTION },
+                        onCancel = onDismiss
                     )
                 }
 
@@ -177,86 +206,25 @@ fun CalendarDialog(
                         isDropdownExpanded = isDropdownExpanded,
                         showInterviewTypeWarning = showInterviewTypeWarning,
                         errorColor = errorColor,
+                        accentColor = accentColor,
                         eventNotes = eventNotes,
-                        onDropdownToggle = { isDropdownExpanded = false },
+                        isUpdate = vacancy.interviewSchedule != null,
+                        onDropdownToggle = { isDropdownExpanded = !isDropdownExpanded },
                         onInterviewTypeSelected = { interviewType ->
                             selectedInterviewType = interviewType
                             isDropdownExpanded = false
                             showInterviewTypeWarning = false
                         },
-                        onNotesChange = { eventNotes = it }
+                        onNotesChange = { eventNotes = it },
+                        onBack = { currentStep = CalendarStep.TIME_SELECTION },
+                        onCancel = onDismiss,
+                        onConfirm = handleConfirm
                     )
                 }
             }
         },
-        confirmButton = {
-            // Only show confirm button in the event summary step
-            if (currentStep == CalendarStep.EVENT_SUMMARY) {
-                Button(
-                    onClick = {
-                        // Check if interview type is selected
-                        if (selectedInterviewType == null) {
-                            // Show warning if no interview type is selected
-                            showInterviewTypeWarning = true
-                        } else {
-                            // Create the interview schedule
-                            val interviewSchedule = InterviewSchedule(
-                                date = selectedDate,
-                                time = formattedTime,
-                                type = selectedInterviewType,
-                                notes = eventNotes
-                            )
-
-                            // Update the vacancy with the interview schedule
-                            val updatedVacancy = vacancy.copy(
-                                interviewSchedule = interviewSchedule
-                            )
-
-                            // Call onConfirm with the updated vacancy
-                            onConfirm(updatedVacancy)
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = accentColor,
-                        contentColor = Color.White
-                    ),
-                    modifier = Modifier.size(width = 120.dp, height = 44.dp)
-                ) {
-                    Text(if (vacancy.interviewSchedule != null) "Update Event" else "Save Event")
-                }
-            }
-        },
-        dismissButton = {
-            // Show different dismiss buttons based on the current step
-            when (currentStep) {
-                CalendarStep.DATE_SELECTION -> {
-                    OutlinedButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.size(width = 100.dp, height = 44.dp)
-                    ) {
-                        Text("Cancel")
-                    }
-                }
-                CalendarStep.TIME_SELECTION -> {
-                    OutlinedButton(
-                        onClick = { currentStep = CalendarStep.DATE_SELECTION },
-                        modifier = Modifier.size(width = 100.dp, height = 44.dp)
-                    ) {
-                        Text("Back")
-                    }
-                }
-                CalendarStep.EVENT_SUMMARY -> {
-                    OutlinedButton(
-                        onClick = onDismiss,
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = errorColor
-                        ),
-                        modifier = Modifier.size(width = 100.dp, height = 44.dp)
-                    ) {
-                        Text("Cancel")
-                    }
-                }
-            }
-        }
+        // We no longer need these buttons as they're now in the steps
+        confirmButton = { },
+        dismissButton = { }
     )
 }
