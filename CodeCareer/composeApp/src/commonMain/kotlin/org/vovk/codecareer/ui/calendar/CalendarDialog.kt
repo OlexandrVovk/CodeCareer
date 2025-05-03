@@ -43,7 +43,7 @@ enum class CalendarStep {
 fun CalendarDialog(
     vacancy: TrackedVacancy,
     onConfirm: (TrackedVacancy) -> Unit,
-    onDeleteMeeting: (TrackedVacancy, InterviewSchedule) -> Unit,
+    onDeleteMeeting: (TrackedVacancy, String) -> Unit,
     onDismiss: () -> Unit
 ) {
     val todaysDate = getTodaysDate()
@@ -180,7 +180,7 @@ fun CalendarDialog(
                             // Find and delete the schedule for this date
                             val schedule = vacancy.interviewSchedules.firstOrNull { it.date == date }
                             if (schedule != null) {
-                                onDeleteMeeting(vacancy, schedule)
+                                onDeleteMeeting(vacancy, date)
                             }
                         }
                     )

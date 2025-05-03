@@ -117,13 +117,13 @@ class TracksPage : Screen {
                     vacancyToSchedule = null
                     showCalendarDialog = false
                 },
-                onDeleteMeeting = { deletedVacancy, schedule ->
-                    // Delete the specific meeting in Firebase
-                    firebaseManager.toDeleteMeeting(deletedVacancy, schedule)
-                    // Update the local list to remove the meeting
+                onDeleteMeeting = { deletedVacancy, date ->
+                    // Delete all meetings for the selected date in Firebase
+                    firebaseManager.toDeleteMeeting(deletedVacancy, date)
+                    // Update the local list to remove all meetings on that date
                     trackedVacancies = trackedVacancies.map {
                         if (it.jobInfo.jobUrl == deletedVacancy.jobInfo.jobUrl) {
-                            it.copy(interviewSchedules = it.interviewSchedules.filter { it != schedule })
+                            it.copy(interviewSchedules = it.interviewSchedules.filter { it.date != date })
                         } else it
                     }
                     vacancyToSchedule = null

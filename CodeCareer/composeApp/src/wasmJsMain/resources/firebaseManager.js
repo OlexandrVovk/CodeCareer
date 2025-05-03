@@ -668,11 +668,18 @@ function deleteMeeting(jobUrl, dateAndTime, callback) {
                         return;
                     }
                     const data = docSnap.data();
-                    // Get existing schedules array or fallback to single schedule
+                    // Retrieve existing schedules array or fallback for backward compatibility
                     const schedules = data.interviewSchedules || (data.interviewSchedule ? [data.interviewSchedule] : []);
-                    // Filter out the schedule to delete
-                    const filteredSchedules = schedules.filter(s => s.date !== date || s.time !== time);
-                    // Update the document with the new schedules list
+                    // Determine filtered schedules: remove all matching date (and time if provided)
+                    let filteredSchedules;
+                    if (time === undefined) {
+                        // Remove all schedules on this date
+                        filteredSchedules = schedules.filter(s => s.date !== date);
+                    } else {
+                        // Remove only the specific date/time
+                        filteredSchedules = schedules.filter(s => s.date !== date || s.time !== time);
+                    }
+                    // Update the document with the filtered schedules list
                     return firestoreModule.updateDoc(vacancyRef, {
                         interviewSchedules: filteredSchedules,
                         lastUpdated: firestoreModule.serverTimestamp()

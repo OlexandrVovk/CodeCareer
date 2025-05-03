@@ -9,7 +9,6 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.vovk.codecareer.dal.entities.JobCartEntity
 import org.vovk.codecareer.dal.entities.TrackedVacancy
-import org.vovk.codecareer.dal.entities.InterviewSchedule
 import org.vovk.codecareer.dal.enums.VacancyStatus
 
 // Auth JS functions declaration
@@ -255,16 +254,16 @@ class FirebaseManager {
     }
 
     /**
-     * Deletes a specific interview meeting in Firebase.
+     * Deletes all interview meetings for a specific date in Firebase.
      * @param vacancy The tracked vacancy.
-     * @param schedule The interview schedule to delete.
+     * @param date The date ("YYYY-MM-DD") for which all meetings should be deleted.
      */
-    fun toDeleteMeeting(vacancy: TrackedVacancy, schedule: InterviewSchedule): Boolean {
+    fun toDeleteMeeting(vacancy: TrackedVacancy, date: String): Boolean {
         var result = false
-        val dateAndTime = schedule.date + "_" + schedule.time
+        // Pass only the date; JS will remove all schedules matching this date
         deleteMeeting(
             vacancyUrl = vacancy.jobInfo.jobUrl,
-            dateAndTime = dateAndTime
+            dateAndTime = date
         ) { response -> result = response }
         return result
     }
