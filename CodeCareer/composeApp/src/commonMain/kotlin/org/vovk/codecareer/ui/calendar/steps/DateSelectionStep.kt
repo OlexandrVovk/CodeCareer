@@ -35,7 +35,7 @@ fun DateSelectionStep(
     showPastDateError: Boolean,
     onDateSelected: (String) -> Unit,
     onCancel: () -> Unit,
-    onDeleteMeeting: () -> Unit
+    onDeleteMeeting: (String) -> Unit
 ) {
     var selectedDate by remember { mutableStateOf(currentDate)}
     Column(modifier = Modifier.padding(8.dp)) {
@@ -50,8 +50,8 @@ fun DateSelectionStep(
             // Build initial date
             val parts = currentDate.split("-").mapNotNull { it.toIntOrNull() }
             val initial = if (parts.size == 3) CalendarDate(parts[0], parts[1], parts[2]) else CalendarDate.Companion.now()
-            // Existing scheduled dates
-            val scheduled = listOfNotNull(vacancy.interviewSchedule?.date).filter { it.isNotEmpty() }
+            // Existing scheduled dates (allow multiple)
+            val scheduled = vacancy.interviewSchedules.map { it.date }.filter { it.isNotEmpty() }
             CustomCalendar(
                 initialDate = initial,
                 onDateSelected = { d -> selectedDate = d.format() },
@@ -92,10 +92,10 @@ fun DateSelectionStep(
                 Text("Proceed to next step")
             }
             // Show delete button if a meeting is scheduled on the selected date
-            if (vacancy.interviewSchedule?.date == selectedDate) {
+            if (vacancy.interviewSchedules.any { it.date == selectedDate }) {
                 Spacer(modifier = Modifier.width(8.dp))
                 OutlinedButton(
-                    onClick = onDeleteMeeting,
+                    onClick = { onDeleteMeeting(selectedDate) },
                     modifier = Modifier.size(width = 100.dp, height = 44.dp)
                 ) {
                     Text("Delete Meeting", color = Color.Red)

@@ -4,10 +4,12 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.vovk.codecareer.dal.entities.JobCartEntity
 import org.vovk.codecareer.dal.entities.TrackedVacancy
+import org.vovk.codecareer.dal.entities.InterviewSchedule
 import org.vovk.codecareer.dal.enums.VacancyStatus
 
 // Auth JS functions declaration
@@ -147,36 +149,59 @@ class FirebaseManager {
 
                                     val notes = vacancyObj["notes"]?.jsonPrimitive?.content ?: ""
 
-                                    // Parse interview schedule if present
-                                    // Use safe cast to JsonObject to handle null or non-object values
-                                    val interviewScheduleObj = vacancyObj["interviewSchedule"] as? JsonObject
-                                    val interviewSchedule = if (interviewScheduleObj != null) {
-                                        val date = interviewScheduleObj["date"]?.jsonPrimitive?.content ?: ""
-                                        val time = interviewScheduleObj["time"]?.jsonPrimitive?.content ?: ""
-                                        val typeString = interviewScheduleObj["type"]?.jsonPrimitive?.content
-                                        val type = try {
-                                            typeString?.let { org.vovk.codecareer.dal.enums.InterviewType.valueOf(it) }
-                                        } catch (e: IllegalArgumentException) {
-                                            null
+                                    // Parse multiple interview schedules if present
+                                    val interviewSchedules: List<org.vovk.codecareer.dal.entities.InterviewSchedule> =
+                                        (vacancyObj["interviewSchedules"] as? JsonArray)?.mapNotNull { scheduleElement ->
+                                            try {
+                                                val scheduleObj = scheduleElement.jsonObject
+                                                val date = scheduleObj["date"]?.jsonPrimitive?.content ?: ""
+                                                val time = scheduleObj["time"]?.jsonPrimitive?.content ?: ""
+                                                val typeString = scheduleObj["type"]?.jsonPrimitive?.content
+                                                val type = try {
+                                                    typeString?.let { org.vovk.codecareer.dal.enums.InterviewType.valueOf(it) }
+                                                } catch (_: IllegalArgumentException) {
+                                                    null
+                                                }
+                                                val scheduleNotes = scheduleObj["notes"]?.jsonPrimitive?.content ?: ""
+                                                org.vovk.codecareer.dal.entities.InterviewSchedule(
+                                                    date = date,
+                                                    time = time,
+                                                    type = type,
+                                                    notes = scheduleNotes
+                                                )
+                                            } catch (e: Exception) {
+                                                println("Error parsing interview schedule: ${e.message}")
+                                                null
+                                            }
+                                        } ?: run {
+                                            // Fallback to singular interviewSchedule field for backward compatibility
+                                            (vacancyObj["interviewSchedule"] as? JsonObject)?.let { obj ->
+                                                val date = obj["date"]?.jsonPrimitive?.content ?: ""
+                                                val time = obj["time"]?.jsonPrimitive?.content ?: ""
+                                                val typeString = obj["type"]?.jsonPrimitive?.content
+                                                val type = try {
+                                                    typeString?.let { org.vovk.codecareer.dal.enums.InterviewType.valueOf(it) }
+                                                } catch (_: IllegalArgumentException) {
+                                                    null
+                                                }
+                                                val scheduleNotes = obj["notes"]?.jsonPrimitive?.content ?: ""
+                                                listOf(
+                                                    org.vovk.codecareer.dal.entities.InterviewSchedule(
+                                                        date = date,
+                                                        time = time,
+                                                        type = type,
+                                                        notes = scheduleNotes
+                                                    )
+                                                )
+                                            } ?: emptyList()
                                         }
-                                        val interviewNotes = interviewScheduleObj["notes"]?.jsonPrimitive?.content ?: ""
-
-                                        org.vovk.codecareer.dal.entities.InterviewSchedule(
-                                            date = date,
-                                            time = time,
-                                            type = type,
-                                            notes = interviewNotes
-                                        )
-                                    } else {
-                                        null
-                                    }
 
                                     // Create TrackedVacancy object
                                     TrackedVacancy(
                                         jobInfo = jobCartEntity,
                                         status = status,
                                         notes = notes,
-                                        interviewSchedule = interviewSchedule
+                                        interviewSchedules = interviewSchedules
                                     )
                                 } else {
                                     null
@@ -217,31 +242,33 @@ class FirebaseManager {
 
     fun toScheduleInterview(updatedVacancy: TrackedVacancy): Boolean {
         var result = false
-        val dateAndTime = updatedVacancy.interviewSchedule!!.date + "_" + updatedVacancy.interviewSchedule!!.time
+        // Use the last interview schedule in the list
+        val schedule = updatedVacancy.interviewSchedules.lastOrNull() ?: return false
+        val dateAndTime = schedule.date + "_" + schedule.time
         scheduleInterview(
             vacancyUrl = updatedVacancy.jobInfo.jobUrl,
             dateAndTime = dateAndTime,
-            type = updatedVacancy.interviewSchedule!!.type.toString(),
-            notes = updatedVacancy.interviewSchedule!!.notes,
+            type = schedule.type.toString(),
+            notes = schedule.notes
         ) { response -> result = response }
         return result
     }
 
     /**
-     * Deletes a scheduled meeting for the given tracked vacancy.
+     * Deletes a specific interview meeting in Firebase.
+     * @param vacancy The tracked vacancy.
+     * @param schedule The interview schedule to delete.
      */
-    fun toDeleteMeeting(vacancy: TrackedVacancy): Boolean {
+    fun toDeleteMeeting(vacancy: TrackedVacancy, schedule: InterviewSchedule): Boolean {
         var result = false
-        val schedule = vacancy.interviewSchedule
-        if (schedule != null) {
-            val dateAndTime = schedule.date + "_" + schedule.time
-            deleteMeeting(
-                vacancyUrl = vacancy.jobInfo.jobUrl,
-                dateAndTime = dateAndTime
-            ) { response -> result = response }
-        }
+        val dateAndTime = schedule.date + "_" + schedule.time
+        deleteMeeting(
+            vacancyUrl = vacancy.jobInfo.jobUrl,
+            dateAndTime = dateAndTime
+        ) { response -> result = response }
         return result
     }
+
     fun toDeleteTrackedVacancy(updatedVacancy: TrackedVacancy): Boolean {
         var result: Boolean = false
         deleteTrackedVacancy(updatedVacancy.jobInfo.jobUrl){

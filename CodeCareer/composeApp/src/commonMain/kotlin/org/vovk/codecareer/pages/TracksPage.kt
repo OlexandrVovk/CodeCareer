@@ -109,24 +109,21 @@ class TracksPage : Screen {
             CalendarDialog(
                 vacancy = vacancyToSchedule!!,
                 onConfirm = { updatedVacancy ->
-                    // Update the vacancy with the interview schedule
                     vacancyToSchedule = updatedVacancy
-                    // Schedule the interview in Firebase
                     firebaseManager.toScheduleInterview(updatedVacancy)
-                    // Update the local list of vacancies
                     trackedVacancies = trackedVacancies.map {
                         if (it.jobInfo.jobUrl == updatedVacancy.jobInfo.jobUrl) updatedVacancy else it
                     }
                     vacancyToSchedule = null
                     showCalendarDialog = false
                 },
-                onDeleteMeeting = { deletedVacancy ->
-                    // Delete the scheduled meeting in Firebase
-                    firebaseManager.toDeleteMeeting(deletedVacancy)
+                onDeleteMeeting = { deletedVacancy, schedule ->
+                    // Delete the specific meeting in Firebase
+                    firebaseManager.toDeleteMeeting(deletedVacancy, schedule)
                     // Update the local list to remove the meeting
                     trackedVacancies = trackedVacancies.map {
                         if (it.jobInfo.jobUrl == deletedVacancy.jobInfo.jobUrl) {
-                            it.copy(interviewSchedule = null)
+                            it.copy(interviewSchedules = it.interviewSchedules.filter { it != schedule })
                         } else it
                     }
                     vacancyToSchedule = null

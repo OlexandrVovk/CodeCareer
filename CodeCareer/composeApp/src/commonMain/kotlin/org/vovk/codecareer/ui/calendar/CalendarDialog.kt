@@ -43,15 +43,15 @@ enum class CalendarStep {
 fun CalendarDialog(
     vacancy: TrackedVacancy,
     onConfirm: (TrackedVacancy) -> Unit,
-    onDeleteMeeting: (TrackedVacancy) -> Unit,
+    onDeleteMeeting: (TrackedVacancy, InterviewSchedule) -> Unit,
     onDismiss: () -> Unit
 ) {
     val todaysDate = getTodaysDate()
     val accentColor = Color(0xFF864AED)
     val errorColor = Color(0xFFE57373)
 
-    // Get existing interview schedule data if available
-    val existingSchedule = vacancy.interviewSchedule
+    // Get existing interview schedules list (for multi-meeting support)
+    val existingSchedules = vacancy.interviewSchedules
 
     // Track the current step in the flow
     var currentStep by remember { mutableStateOf(CalendarStep.DATE_SELECTION) }
@@ -88,20 +88,19 @@ fun CalendarDialog(
 
     // Effect to populate form fields when a scheduled date is selected
     LaunchedEffect(selectedDate) {
-        // Check if the selected date matches the scheduled date
-        if (existingSchedule != null && selectedDate == existingSchedule.date) {
-            // Parse time from the scheduled date (format: "HH:MM")
-            val timeParts = existingSchedule.time.split(":")
+        // Find a schedule matching the selected date, if any
+        val scheduleForDate = existingSchedules.firstOrNull { it.date == selectedDate }
+        if (scheduleForDate != null) {
+            // Parse time from the scheduled time (format: "HH:MM")
+            val timeParts = scheduleForDate.time.split(":")
             if (timeParts.size == 2) {
                 eventHours = timeParts[0].toIntOrNull() ?: 9
                 eventMinutes = timeParts[1].toIntOrNull() ?: 0
             }
 
-            // Set interview type from the scheduled date
-            selectedInterviewType = existingSchedule.type
-
-            // Set notes from the scheduled date
-            eventNotes = existingSchedule.notes
+            // Set interview type and notes from the schedule
+            selectedInterviewType = scheduleForDate.type
+            eventNotes = scheduleForDate.notes
         }
     }
 
@@ -120,9 +119,9 @@ fun CalendarDialog(
                 notes = eventNotes
             )
 
-            // Update the vacancy with the interview schedule
+            // Update the vacancy with the new interview schedule list
             val updatedVacancy = vacancy.copy(
-                interviewSchedule = interviewSchedule
+                interviewSchedules = existingSchedules + interviewSchedule
             )
 
             // Call onConfirm with the updated vacancy
@@ -174,12 +173,15 @@ fun CalendarDialog(
                         onDateSelected = { date ->
                             selectedDate = date
                             showPastDateError = false
-                            // Automatically advance to next step after date selection
                             currentStep = CalendarStep.TIME_SELECTION
                         },
                         onCancel = onDismiss,
-                        onDeleteMeeting = {
-                            onDeleteMeeting(vacancy)
+                        onDeleteMeeting = { date ->
+                            // Find and delete the schedule for this date
+                            val schedule = vacancy.interviewSchedules.firstOrNull { it.date == date }
+                            if (schedule != null) {
+                                onDeleteMeeting(vacancy, schedule)
+                            }
                         }
                     )
                 }
@@ -212,7 +214,7 @@ fun CalendarDialog(
                         errorColor = errorColor,
                         accentColor = accentColor,
                         eventNotes = eventNotes,
-                        isUpdate = vacancy.interviewSchedule != null,
+                        isUpdate = existingSchedules.any { it.date == selectedDate },
                         onDropdownToggle = { isDropdownExpanded = !isDropdownExpanded },
                         onInterviewTypeSelected = { interviewType ->
                             selectedInterviewType = interviewType

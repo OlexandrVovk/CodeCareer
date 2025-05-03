@@ -440,7 +440,8 @@ function getTrackedVacancies(callback) {
                             },
                             status: data.trackingStatus || "INTERESTED",
                             notes: data.notes || "",
-                            interviewSchedule: data.interviewSchedule || null
+                            // Support multiple interview schedules
+                            interviewSchedules: data.interviewSchedules || (data.interviewSchedule ? [data.interviewSchedule] : [])
                         });
                     });
 
@@ -610,9 +611,9 @@ function scheduleInterview(jobUrl, dateAndTime, type, notes, callback) {
                 notes: notes
             };
 
-            // Update data with interview schedule
+            // Update data by adding interview schedule to the schedules array
             const updateData = {
-                interviewSchedule: interviewSchedule,
+                interviewSchedules: firestoreModule.arrayUnion(interviewSchedule),
                 lastUpdated: firestoreModule.serverTimestamp()
             };
 
@@ -657,12 +658,26 @@ function deleteMeeting(jobUrl, dateAndTime, callback) {
                 firestore,
                 `users/${user.email}/tracked_vacancies/${encodedJobUrl}`
             );
-            // Remove the interviewSchedule field to delete the meeting
-            const updateData = {
-                interviewSchedule: null,
-                lastUpdated: firestoreModule.serverTimestamp()
-            };
-            firestoreModule.updateDoc(vacancyRef, updateData)
+            // Delete a specific meeting from the schedules array
+            const [date, time] = dateAndTime.split('_');
+            // Read the current document
+            firestoreModule.getDoc(vacancyRef)
+                .then((docSnap) => {
+                    if (!docSnap.exists()) {
+                        callback(false);
+                        return;
+                    }
+                    const data = docSnap.data();
+                    // Get existing schedules array or fallback to single schedule
+                    const schedules = data.interviewSchedules || (data.interviewSchedule ? [data.interviewSchedule] : []);
+                    // Filter out the schedule to delete
+                    const filteredSchedules = schedules.filter(s => s.date !== date || s.time !== time);
+                    // Update the document with the new schedules list
+                    return firestoreModule.updateDoc(vacancyRef, {
+                        interviewSchedules: filteredSchedules,
+                        lastUpdated: firestoreModule.serverTimestamp()
+                    });
+                })
                 .then(() => {
                     console.log("Meeting deleted successfully");
                     callback(true);
