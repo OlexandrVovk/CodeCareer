@@ -4,6 +4,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.vovk.codecareer.dal.entities.JobCartEntity
 import org.vovk.codecareer.dal.entities.TrackedVacancy
@@ -147,7 +148,8 @@ class FirebaseManager {
                                     val notes = vacancyObj["notes"]?.jsonPrimitive?.content ?: ""
 
                                     // Parse interview schedule if present
-                                    val interviewScheduleObj = vacancyObj["interviewSchedule"]?.jsonObject
+                                    // Use safe cast to JsonObject to handle null or non-object values
+                                    val interviewScheduleObj = vacancyObj["interviewSchedule"] as? JsonObject
                                     val interviewSchedule = if (interviewScheduleObj != null) {
                                         val date = interviewScheduleObj["date"]?.jsonPrimitive?.content ?: ""
                                         val time = interviewScheduleObj["time"]?.jsonPrimitive?.content ?: ""
