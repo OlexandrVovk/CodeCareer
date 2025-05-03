@@ -38,9 +38,10 @@ fun EventSummaryStep(
     onDropdownToggle: () -> Unit,
     onInterviewTypeSelected: (InterviewType) -> Unit,
     onNotesChange: (String) -> Unit,
-    onBack: () -> Unit, // Added back callback
-    onCancel: () -> Unit, // Added cancel callback
-    onConfirm: () -> Unit // Added confirm callback
+    onBack: () -> Unit,
+    onCancel: () -> Unit,
+    onDeleteMeeting: () -> Unit, // Delete specific meeting
+    onConfirm: () -> Unit
 ) {
     Column {
         Card(
@@ -101,29 +102,28 @@ fun EventSummaryStep(
                 .padding(top = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Left side - Back and Cancel buttons
+            // Left side - Back, Cancel, and optional Delete buttons
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedButton(
                     onClick = onBack,
                     modifier = Modifier.size(width = 100.dp, height = 44.dp)
-                ) {
-                    Text("Back")
-                }
-
+                ) { Text("Back") }
                 OutlinedButton(
                     onClick = onCancel,
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = errorColor
-                    ),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = errorColor),
                     modifier = Modifier.size(width = 100.dp, height = 44.dp)
-                ) {
-                    Text("Cancel")
+                ) { Text("Cancel") }
+                if (isUpdate) {
+                    OutlinedButton(
+                        onClick = onDeleteMeeting,
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = errorColor),
+                        modifier = Modifier.size(width = 120.dp, height = 44.dp)
+                    ) { Text("Delete Meeting") }
                 }
             }
-
-            // Right side - Confirm button
+            // Right side - Confirm/Save button
             Button(
                 onClick = onConfirm,
                 colors = ButtonDefaults.buttonColors(
@@ -131,9 +131,7 @@ fun EventSummaryStep(
                     contentColor = Color.White
                 ),
                 modifier = Modifier.size(width = 120.dp, height = 44.dp)
-            ) {
-                Text(if (isUpdate) "Update Event" else "Save Event")
-            }
+            ) { Text(if (isUpdate) "Update Event" else "Save Event") }
         }
     }
 }

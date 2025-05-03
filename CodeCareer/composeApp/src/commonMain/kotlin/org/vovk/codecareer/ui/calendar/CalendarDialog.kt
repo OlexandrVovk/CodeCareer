@@ -43,7 +43,8 @@ enum class CalendarStep {
 fun CalendarDialog(
     vacancy: TrackedVacancy,
     onConfirm: (TrackedVacancy) -> Unit,
-    onDeleteMeeting: (TrackedVacancy, String) -> Unit,
+    onDeleteMeeting: (TrackedVacancy, org.vovk.codecareer.dal.entities.InterviewSchedule) -> Unit,
+    onDeleteMeetingsOnDate: (TrackedVacancy, String) -> Unit,
     onDismiss: () -> Unit
 ) {
     val todaysDate = getTodaysDate()
@@ -182,11 +183,8 @@ fun CalendarDialog(
                         },
                         onCancel = onDismiss,
                         onDeleteMeeting = { date ->
-                            // Find and delete the schedule for this date
-                            val schedule = vacancy.interviewSchedules.firstOrNull { it.date == date }
-                            if (schedule != null) {
-                                onDeleteMeeting(vacancy, date)
-                            }
+                            // Delete all meetings for this date at once
+                            onDeleteMeetingsOnDate(vacancy, date)
                         }
                     )
                 }
@@ -242,6 +240,13 @@ fun CalendarDialog(
                         onNotesChange = { eventNotes = it },
                         onBack = { currentStep = CalendarStep.TIME_SELECTION },
                         onCancel = onDismiss,
+                        onDeleteMeeting = {
+                            // Delete this specific meeting
+                            val schedule = existingSchedules.firstOrNull { it.date == selectedDate && it.time == formattedTime }
+                            if (schedule != null) {
+                                onDeleteMeeting(vacancy, schedule)
+                            }
+                        },
                         onConfirm = handleConfirm
                     )
                 }

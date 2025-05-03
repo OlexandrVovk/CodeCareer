@@ -117,13 +117,29 @@ class TracksPage : Screen {
                     vacancyToSchedule = null
                     showCalendarDialog = false
                 },
-                onDeleteMeeting = { deletedVacancy, date ->
-                    // Delete all meetings for the selected date in Firebase
-                    firebaseManager.toDeleteMeeting(deletedVacancy, date)
-                    // Update the local list to remove all meetings on that date
+                onDeleteMeeting = { deletedVacancy, schedule ->
+                    // Delete this specific meeting in Firebase
+                    firebaseManager.toDeleteMeeting(deletedVacancy, schedule)
+                    // Update local list: remove only this schedule
                     trackedVacancies = trackedVacancies.map {
                         if (it.jobInfo.jobUrl == deletedVacancy.jobInfo.jobUrl) {
-                            it.copy(interviewSchedules = it.interviewSchedules.filter { it.date != date })
+                            it.copy(
+                                interviewSchedules = it.interviewSchedules.filter { sch -> sch != schedule }
+                            )
+                        } else it
+                    }
+                    vacancyToSchedule = null
+                    showCalendarDialog = false
+                },
+                onDeleteMeetingsOnDate = { deletedVacancy, date ->
+                    // Delete ALL meetings for selected date in Firebase
+                    firebaseManager.toDeleteMeetingsOnDate(deletedVacancy, date)
+                    // Update local list: remove all schedules on that date
+                    trackedVacancies = trackedVacancies.map {
+                        if (it.jobInfo.jobUrl == deletedVacancy.jobInfo.jobUrl) {
+                            it.copy(
+                                interviewSchedules = it.interviewSchedules.filter { sch -> sch.date != date }
+                            )
                         } else it
                     }
                     vacancyToSchedule = null
