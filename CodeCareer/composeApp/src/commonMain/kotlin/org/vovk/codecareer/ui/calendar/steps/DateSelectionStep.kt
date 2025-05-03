@@ -17,6 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.vovk.codecareer.dal.entities.TrackedVacancy
@@ -44,7 +47,7 @@ fun DateSelectionStep(
                 .fillMaxWidth()
                 .heightIn(min = 360.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .background(Color.White)
+                .background(Color(17, 18, 20, 255))
                 .padding(8.dp)
         ) {
             // Build initial date
@@ -77,28 +80,54 @@ fun DateSelectionStep(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
             OutlinedButton(
                 onClick = onCancel,
-                modifier = Modifier.size(width = 100.dp, height = 44.dp)
+                modifier = Modifier
+                    .size(width = 100.dp, height = 44.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Color(57,60,64,255),
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(17,18,20,255)
+                )
             ) {
                 Text("Cancel")
             }
             OutlinedButton(
                 onClick = { onDateSelected(selectedDate) },
-                modifier = Modifier.size(width = 100.dp, height = 44.dp)
+                modifier = Modifier
+                    .size(width = 100.dp, height = 44.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Color(57,60,64,255),
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(17,18,20,255)
+                )
             ) {
-                Text("Proceed to next step")
+                Text("Next")
             }
             // Show delete button if a meeting is scheduled on the selected date
             if (vacancy.interviewSchedules.any { it.date == selectedDate }) {
-                Spacer(modifier = Modifier.width(8.dp))
                 OutlinedButton(
                     onClick = { onDeleteMeeting(selectedDate) },
-                    modifier = Modifier.size(width = 100.dp, height = 44.dp)
+                    modifier = Modifier
+                        .size(width = 100.dp, height = 44.dp)
+                        .border(
+                            width = 2.dp,
+                            color = Color(57,60,64,255),
+                            shape = RoundedCornerShape(8.dp)
+                        ),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(17,18,20,255)
+                    )
                 ) {
-                    Text("Delete Meeting", color = Color.Red)
+                    Text("Delete")
                 }
             }
         }

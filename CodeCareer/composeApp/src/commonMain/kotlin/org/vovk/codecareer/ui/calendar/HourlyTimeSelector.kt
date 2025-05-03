@@ -51,8 +51,9 @@ fun HourlyTimeSelector(
                 val hasEvent = eventText.isNotEmpty()
                 // Highlight selection or scheduled events
                 val bgColor = when {
+                    hasEvent && isSelected ->  Color(0xFFFFD700).copy(alpha = 0.2f)
                     isSelected -> MaterialTheme.colors.primary.copy(alpha = 0.1f)
-                    hasEvent -> MaterialTheme.colors.secondary.copy(alpha = 0.1f)
+                    hasEvent ->  Color(0xFFFFD700).copy(alpha = 0.2f)
                     else -> Color.Transparent
                 }
 
@@ -68,13 +69,13 @@ fun HourlyTimeSelector(
                         text = label,
                         fontSize = 16.sp,
                         modifier = Modifier.width(60.dp),
-                        color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
+                        color = Color(199, 194, 200)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = eventText,
                         fontSize = 14.sp,
-                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
+                        color = Color(199, 194, 200)
                     )
                 }
                 Divider()

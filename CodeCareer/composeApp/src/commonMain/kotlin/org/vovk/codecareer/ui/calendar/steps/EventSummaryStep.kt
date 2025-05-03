@@ -1,9 +1,14 @@
 package org.vovk.codecareer.ui.calendar.steps
 
+//import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
+//import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
@@ -45,26 +50,58 @@ fun EventSummaryStep(
 ) {
     Column {
         Card(
+            backgroundColor = Color(17, 18, 20, 255),
+            contentColor = Color(199, 194, 200),
+            shape = RoundedCornerShape(16.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             elevation = 4.dp
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Event Summary", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(
+                    "Event Summary",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
                 Spacer(Modifier.height(8.dp))
-                Text("Date: $selectedDate")
-                Text("Time: $formattedTime")
+                Text(
+                    "Date: $selectedDate",
+                    color = Color(199, 194, 200)
+                )
+                Text(
+                    "Time: $formattedTime",
+                    color = Color(199, 194, 200)
+                )
                 Spacer(Modifier.height(16.dp))
                 // Interview type dropdown
                 Box(modifier = Modifier.fillMaxWidth()) {
                     OutlinedButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = onDropdownToggle
+                        onClick = onDropdownToggle,
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .border(
+                                width = 2.dp,
+                                color = Color(57,60,64,255),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(17,18,20,255)
+                        )
                     ) {
-                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                            Text(selectedInterviewType?.displayName ?: "Select interview type", modifier = Modifier.weight(1f))
-                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown")
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                selectedInterviewType?.displayName ?: "Select interview type",
+                                color = Color.White
+                            )
+                            Icon(
+                                Icons.Default.ArrowDropDown,
+                                contentDescription = "Dropdown",
+                                tint = Color.White
+                            )
                         }
                     }
                     DropdownMenu(
@@ -85,12 +122,22 @@ fun EventSummaryStep(
                 OutlinedTextField(
                     value = eventNotes,
                     onValueChange = onNotesChange,
-                    label = { Text("Notes") },
-                    placeholder = { Text("Any additional details…") },
+                    label = { Text("Notes", color = Color(199, 194, 200)) },
+                    placeholder = { Text("Any additional details…", color = Color.Gray) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(80.dp),
-                    maxLines = 3
+                    maxLines = 3,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.White,
+                        cursorColor = accentColor,
+                        focusedBorderColor = accentColor,
+                        unfocusedBorderColor = Color.White,
+                        backgroundColor = Color(17, 18, 20, 255),
+                        placeholderColor = Color.Gray,
+                        focusedLabelColor = accentColor,
+                        unfocusedLabelColor = Color.White
+                    )
                 )
             }
         }
@@ -100,38 +147,70 @@ fun EventSummaryStep(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
-            // Left side - Back, Cancel, and optional Delete buttons
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            OutlinedButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .size(width = 100.dp, height = 44.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Color(57,60,64,255),
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(17,18,20,255)
+                )
             ) {
+                Text("Back")
+            }
+            OutlinedButton(
+                onClick = onCancel,
+                modifier = Modifier
+                    .size(width = 100.dp, height = 44.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Color(57,60,64,255),
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(17,18,20,255)
+                )
+            ) {
+                Text("Cancel")
+            }
+            if (isUpdate) {
                 OutlinedButton(
-                    onClick = onBack,
-                    modifier = Modifier.size(width = 100.dp, height = 44.dp)
-                ) { Text("Back") }
-                OutlinedButton(
-                    onClick = onCancel,
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = errorColor),
-                    modifier = Modifier.size(width = 100.dp, height = 44.dp)
-                ) { Text("Cancel") }
-                if (isUpdate) {
-                    OutlinedButton(
-                        onClick = onDeleteMeeting,
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = errorColor),
-                        modifier = Modifier.size(width = 120.dp, height = 44.dp)
-                    ) { Text("Delete Meeting") }
+                    onClick = onDeleteMeeting,
+                    modifier = Modifier
+                        .size(width = 100.dp, height = 44.dp)
+                        .border(
+                            width = 2.dp,
+                            color = Color(57,60,64,255),
+                            shape = RoundedCornerShape(8.dp)
+                        ),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(17,18,20,255)
+                    )
+                ) {
+                    Text("Delete")
                 }
             }
-            // Right side - Confirm/Save button
-            Button(
+            OutlinedButton(
                 onClick = onConfirm,
+                modifier = Modifier
+                    .size(width = 100.dp, height = 44.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Color(57,60,64,255),
+                        shape = RoundedCornerShape(8.dp)
+                    ),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = accentColor,
-                    contentColor = Color.White
-                ),
-                modifier = Modifier.size(width = 120.dp, height = 44.dp)
-            ) { Text(if (isUpdate) "Update Event" else "Save Event") }
+                    backgroundColor = Color(17,18,20,255)
+                )
+            ) {
+                Text(if (isUpdate) "Update" else "Save")
+            }
         }
     }
 }

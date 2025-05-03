@@ -22,6 +22,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.vovk.codecareer.ui.calendar.HourlyTimeSelector
@@ -80,27 +84,54 @@ fun TimeSelectionStep(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
             OutlinedButton(
                 onClick = onBack,
-                modifier = Modifier.size(width = 100.dp, height = 44.dp)
+                modifier = Modifier
+                    .size(width = 100.dp, height = 44.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Color(57,60,64,255),
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(17,18,20,255)
+                )
             ) {
                 Text("Back")
             }
 
             OutlinedButton(
                 onClick = onCancel,
-                modifier = Modifier.size(width = 100.dp, height = 44.dp)
+                modifier = Modifier
+                    .size(width = 100.dp, height = 44.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Color(57,60,64,255),
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(17,18,20,255)
+                )
             ) {
                 Text("Cancel")
             }
 
             OutlinedButton(
                 onClick = { onHourSelected(selectedHour) },
-                modifier = Modifier.size(width = 100.dp, height = 44.dp)
+                modifier = Modifier
+                    .size(width = 100.dp, height = 44.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Color(57,60,64,255),
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(17,18,20,255)
+                )
             ) {
-                Text("Proceed to next step")
+                Text("Next")
             }
         }
     }

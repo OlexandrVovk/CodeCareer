@@ -137,6 +137,8 @@ fun CalendarDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        backgroundColor = Color(17, 18, 20, 255),
+        contentColor = Color(199, 194, 200),
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -151,7 +153,8 @@ fun CalendarDialog(
                         CalendarStep.DATE_SELECTION -> "Select Date"
                         CalendarStep.TIME_SELECTION -> "Select Time"
                         CalendarStep.EVENT_SUMMARY -> "Event Summary"
-                    }
+                    },
+                    color = Color.White
                 )
             }
         },
@@ -160,11 +163,12 @@ fun CalendarDialog(
                 // Vacancy info - always visible
                 Text(
                     text = vacancy.jobInfo.jobName,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
                 Text(
                     text = "at ${vacancy.jobInfo.companyName}",
-                    color = Color.Gray
+                    color = Color(199, 194, 200)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
