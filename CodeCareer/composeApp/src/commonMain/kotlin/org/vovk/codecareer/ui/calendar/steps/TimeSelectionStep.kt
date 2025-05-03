@@ -51,7 +51,7 @@ fun TimeSelectionStep(
     }
     Column {
         HourlyTimeSelector(
-            selectedHour = selectedHour,
+            focusHour = selectedHour,
             hourlyEvents = hourlyEvents,
             onHourSelected = { hour -> selectedHour = hour },
             modifier = Modifier.fillMaxWidth()

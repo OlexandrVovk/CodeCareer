@@ -63,14 +63,16 @@ fun CalendarDialog(
     var selectedInterviewType by remember { mutableStateOf<InterviewType?>(null) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
 
-    // Initialize time from existing schedule or default to 9:00 AM
-    var eventHours by remember {
-        val hours = 9
-        mutableStateOf(hours)
+    // Initialize time based on existing schedules for selected date, default to 12:00
+    var eventHours by remember(selectedDate, existingSchedules) {
+        val hoursForDate = existingSchedules.filter { it.date == selectedDate }
+            .mapNotNull { it.time.split(":").getOrNull(0)?.toIntOrNull() }
+        mutableStateOf(hoursForDate.minOrNull() ?: 12)
     }
-    var eventMinutes by remember {
-        val minutes = 0
-        mutableStateOf(minutes)
+    var eventMinutes by remember(selectedDate, existingSchedules) {
+        val minutesForDate = existingSchedules.filter { it.date == selectedDate }
+            .mapNotNull { it.time.split(":").getOrNull(1)?.toIntOrNull() }
+        mutableStateOf(minutesForDate.minOrNull() ?: 0)
     }
     var eventNotes by remember { mutableStateOf("") }
     var showInterviewTypeWarning by remember { mutableStateOf(false) }
@@ -89,7 +91,10 @@ fun CalendarDialog(
     // Effect to populate form fields when a scheduled date is selected
     LaunchedEffect(selectedDate) {
         // Find a schedule matching the selected date, if any
-        val scheduleForDate = existingSchedules.firstOrNull { it.date == selectedDate }
+        // Choose the earliest schedule for the selected date, if any
+        val scheduleForDate = existingSchedules
+            .filter { it.date == selectedDate }
+            .minByOrNull { it.time.split(":").firstOrNull()?.toIntOrNull() ?: Int.MAX_VALUE }
         if (scheduleForDate != null) {
             // Parse time from the scheduled time (format: "HH:MM")
             val timeParts = scheduleForDate.time.split(":")

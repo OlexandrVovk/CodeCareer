@@ -9,6 +9,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,21 +19,26 @@ import androidx.compose.ui.unit.sp
 /**
  * Hour-based time selector showing 24 rows.
  *
- * @param selectedHour the current hour (0-23)
+ * @param focusHour the hour to focus/scroll to initially (0-23)
  * @param hourlyEvents a map from hour to event title/summary
  * @param onHourSelected callback when the user taps an hour row
  * @param modifier Modifier for layout adjustments
  */
 @Composable
 fun HourlyTimeSelector(
-    selectedHour: Int,
+    focusHour: Int,
     hourlyEvents: Map<Int, String> = emptyMap(),
     onHourSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Initialize list state to center the focus hour
+    val halfWindow = 3
+    val initialIndex = (focusHour - halfWindow).coerceAtLeast(0)
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex)
     Column(modifier = modifier.fillMaxWidth()) {
         Divider()
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
@@ -41,7 +47,7 @@ fun HourlyTimeSelector(
                 // Format hour as two digits (e.g., "09:00")
                 val label = hour.toString().padStart(2, '0') + ":00"
                 val eventText = hourlyEvents[hour].orEmpty()
-                val isSelected = hour == selectedHour
+                val isSelected = hour == focusHour
                 val hasEvent = eventText.isNotEmpty()
                 // Highlight selection or scheduled events
                 val bgColor = when {
