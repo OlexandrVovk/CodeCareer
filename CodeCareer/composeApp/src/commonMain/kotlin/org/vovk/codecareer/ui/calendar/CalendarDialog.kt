@@ -190,6 +190,7 @@ fun CalendarDialog(
                 if (currentStep == CalendarStep.TIME_SELECTION) {
                     TimeSelectionStep(
                         startingHour = eventHours,
+                        scheduledSchedules = existingSchedules.filter { it.date == selectedDate },
                         showPastTimeError = showPastTimeError,
                         errorColor = errorColor,
                         onHourSelected = {

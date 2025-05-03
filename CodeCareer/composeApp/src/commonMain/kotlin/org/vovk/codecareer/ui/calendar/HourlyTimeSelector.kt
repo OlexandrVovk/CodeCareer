@@ -42,7 +42,13 @@ fun HourlyTimeSelector(
                 val label = hour.toString().padStart(2, '0') + ":00"
                 val eventText = hourlyEvents[hour].orEmpty()
                 val isSelected = hour == selectedHour
-                val bgColor = if (isSelected) MaterialTheme.colors.primary.copy(alpha = 0.1f) else Color.Transparent
+                val hasEvent = eventText.isNotEmpty()
+                // Highlight selection or scheduled events
+                val bgColor = when {
+                    isSelected -> MaterialTheme.colors.primary.copy(alpha = 0.1f)
+                    hasEvent -> MaterialTheme.colors.secondary.copy(alpha = 0.1f)
+                    else -> Color.Transparent
+                }
 
                 Row(
                     modifier = Modifier
