@@ -34,7 +34,8 @@ fun DateSelectionStep(
     errorColor: Color,
     showPastDateError: Boolean,
     onDateSelected: (String) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onDeleteMeeting: () -> Unit
 ) {
     var selectedDate by remember { mutableStateOf(currentDate)}
     Column(modifier = Modifier.padding(8.dp)) {
@@ -89,6 +90,16 @@ fun DateSelectionStep(
                 modifier = Modifier.size(width = 100.dp, height = 44.dp)
             ) {
                 Text("Proceed to next step")
+            }
+            // Show delete button if a meeting is scheduled on the selected date
+            if (vacancy.interviewSchedule?.date == selectedDate) {
+                Spacer(modifier = Modifier.width(8.dp))
+                OutlinedButton(
+                    onClick = onDeleteMeeting,
+                    modifier = Modifier.size(width = 100.dp, height = 44.dp)
+                ) {
+                    Text("Delete Meeting", color = Color.Red)
+                }
             }
         }
     }

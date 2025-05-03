@@ -633,6 +633,52 @@ function scheduleInterview(jobUrl, dateAndTime, type, notes, callback) {
         });
 }
 
+function deleteMeeting(jobUrl, dateAndTime, callback) {
+    // Ensure Firebase is initialized
+    ensureInitialized()
+        .then(() => {
+            // Import Firestore
+            return import('https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js');
+        })
+        .then((firestoreModule) => {
+            // Get the current user
+            const user = auth.currentUser;
+
+            if (!user) {
+                console.error("User not authenticated");
+                callback(false);
+                return;
+            }
+
+            // Initialize Firestore
+            const firestore = firestoreModule.getFirestore(firebaseApp);
+            const encodedJobUrl = encodeURIComponent(jobUrl).replace(/\./g, '%2E');
+            const vacancyRef = firestoreModule.doc(
+                firestore,
+                `users/${user.email}/tracked_vacancies/${encodedJobUrl}`
+            );
+            // Remove the interviewSchedule field to delete the meeting
+            const updateData = {
+                interviewSchedule: null,
+                lastUpdated: firestoreModule.serverTimestamp()
+            };
+            firestoreModule.updateDoc(vacancyRef, updateData)
+                .then(() => {
+                    console.log("Meeting deleted successfully");
+                    callback(true);
+                })
+                .catch((error) => {
+                    console.error("Error deleting meeting:", error);
+                    callback(false);
+                });
+
+        })
+        .catch((error) => {
+            console.error("Error importing Firestore:", error);
+            callback(false);
+        });
+}
+
 
 globalThis.handleGoogleLogin = handleGoogleLogin;
 globalThis.signOut = signOut;
@@ -644,3 +690,4 @@ globalThis.getTrackedVacancies = getTrackedVacancies;
 globalThis.updateTrackedVacancy = updateTrackedVacancy;
 globalThis.deleteTrackedVacancy = deleteTrackedVacancy;
 globalThis.scheduleInterview = scheduleInterview;
+globalThis.deleteMeeting = deleteMeeting;

@@ -43,6 +43,7 @@ enum class CalendarStep {
 fun CalendarDialog(
     vacancy: TrackedVacancy,
     onConfirm: (TrackedVacancy) -> Unit,
+    onDeleteMeeting: (TrackedVacancy) -> Unit,
     onDismiss: () -> Unit
 ) {
     val todaysDate = getTodaysDate()
@@ -176,7 +177,10 @@ fun CalendarDialog(
                             // Automatically advance to next step after date selection
                             currentStep = CalendarStep.TIME_SELECTION
                         },
-                        onCancel = onDismiss
+                        onCancel = onDismiss,
+                        onDeleteMeeting = {
+                            onDeleteMeeting(vacancy)
+                        }
                     )
                 }
 

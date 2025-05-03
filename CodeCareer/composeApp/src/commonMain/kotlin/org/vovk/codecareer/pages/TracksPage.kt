@@ -114,8 +114,20 @@ class TracksPage : Screen {
                     // Schedule the interview in Firebase
                     firebaseManager.toScheduleInterview(updatedVacancy)
                     // Update the local list of vacancies
-                    trackedVacancies = trackedVacancies.map { 
-                        if (it.jobInfo.jobUrl == updatedVacancy.jobInfo.jobUrl) updatedVacancy else it 
+                    trackedVacancies = trackedVacancies.map {
+                        if (it.jobInfo.jobUrl == updatedVacancy.jobInfo.jobUrl) updatedVacancy else it
+                    }
+                    vacancyToSchedule = null
+                    showCalendarDialog = false
+                },
+                onDeleteMeeting = { deletedVacancy ->
+                    // Delete the scheduled meeting in Firebase
+                    firebaseManager.toDeleteMeeting(deletedVacancy)
+                    // Update the local list to remove the meeting
+                    trackedVacancies = trackedVacancies.map {
+                        if (it.jobInfo.jobUrl == deletedVacancy.jobInfo.jobUrl) {
+                            it.copy(interviewSchedule = null)
+                        } else it
                     }
                     vacancyToSchedule = null
                     showCalendarDialog = false
@@ -647,7 +659,7 @@ class TracksPage : Screen {
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Calendar", color = Color(199,194,200))
+                            Text("Plan meeting", color = Color(199,194,200))
                         }
                     }
                 }
