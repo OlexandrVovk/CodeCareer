@@ -53,7 +53,14 @@ fun TimeSelectionStep(
         HourlyTimeSelector(
             focusHour = selectedHour,
             hourlyEvents = hourlyEvents,
-            onHourSelected = { hour -> selectedHour = hour },
+            onHourSelected = { hour ->
+                // Update selection
+                selectedHour = hour
+                // If there's a meeting at this hour, proceed immediately
+                if (hourlyEvents.containsKey(hour)) {
+                    onHourSelected(hour)
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(16.dp))

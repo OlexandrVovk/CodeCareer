@@ -198,10 +198,22 @@ fun CalendarDialog(
                         scheduledSchedules = existingSchedules.filter { it.date == selectedDate },
                         showPastTimeError = showPastTimeError,
                         errorColor = errorColor,
-                        onHourSelected = {
-                            eventHours = it
+                        onHourSelected = { hour ->
+                            // Update selected hour
+                            eventHours = hour
                             showPastTimeError = false
-                            // Automatically advance to next step after time selection
+                            // Prefill interview type and notes if a meeting exists at this time
+                            val schedule = existingSchedules.firstOrNull {
+                                it.date == selectedDate && it.time.split(":").getOrNull(0)?.toIntOrNull() == hour
+                            }
+                            if (schedule != null) {
+                                selectedInterviewType = schedule.type
+                                eventNotes = schedule.notes
+                            } else {
+                                selectedInterviewType = null
+                                eventNotes = ""
+                            }
+                            // Advance to summary step
                             currentStep = CalendarStep.EVENT_SUMMARY
                         },
                         onBack = { currentStep = CalendarStep.DATE_SELECTION },
