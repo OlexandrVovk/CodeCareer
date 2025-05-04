@@ -2,6 +2,8 @@ package com.my.jobsearcher.view.services.parsers.impl;
 
 import com.my.jobsearcher.store.dto.ResponseDto;
 import com.my.jobsearcher.store.entities.VacancyRequest;
+import com.my.jobsearcher.store.enums.Experience;
+import com.my.jobsearcher.store.enums.Employment;
 import com.my.jobsearcher.view.services.parsers.Parser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -27,9 +29,33 @@ public class LinkedInParser implements Parser {
         List<ResponseDto> vacancies = new ArrayList<>();
 
         String langDisplay = vacancyRequest.getLang().toString();
-        String keywords = URLEncoder.encode(langDisplay, StandardCharsets.UTF_8);
-        String location = URLEncoder.encode("Ukraine", StandardCharsets.UTF_8);
-        String url = BASE_URL + "?keywords=" + keywords + "&location=" + location;
+        String keywords    = URLEncoder.encode(langDisplay, StandardCharsets.UTF_8);
+        String location    = URLEncoder.encode("Ukraine",     StandardCharsets.UTF_8);
+
+        String expParam = "";
+        Experience exp = vacancyRequest.getExp();
+        if (exp == Experience.JUNIOR || exp == Experience.JUNIOR_PLUS) {
+            expParam = "&f_E=" + URLEncoder.encode("1,2,3", StandardCharsets.UTF_8);
+        } else if (exp == Experience.MIDDLE
+                || exp == Experience.MIDDLE_PLUS
+                || exp == Experience.SENIOR
+                || exp == Experience.SENIOR_PLUS) {
+            expParam = "&f_E=" + URLEncoder.encode("4", StandardCharsets.UTF_8);
+        }
+
+        String empParam = "";
+        Employment emp = vacancyRequest.getEmp();
+        if (emp == Employment.REMOTE) {
+            empParam = "&f_WT=2";
+        } else if (emp == Employment.OFFICE) {
+            empParam = "&f_WT=1";
+        }
+
+        String url = BASE_URL
+                + "?keywords=" + keywords
+                + "&location=" + location
+                + expParam
+                + empParam;
 
         try {
             Document doc = Jsoup.connect(url)
@@ -39,24 +65,29 @@ public class LinkedInParser implements Parser {
             Element list = doc.selectFirst("ul.jobs-search__results-list");
             if (list == null) return vacancies;
 
+            String filterLang = langDisplay.toLowerCase();
+
             for (Element li : list.select("li")) {
                 Element card = li.selectFirst("div.base-card");
                 if (card == null) continue;
 
-                String jobTitle = textOrEmpty(card.selectFirst("h3.base-search-card__title"));
-                if (!jobTitle.toLowerCase().contains(langDisplay.toLowerCase())) {
+                String jobTitle      = textOrEmpty(card.selectFirst("h3.base-search-card__title"));
+                String jobTitleLower = jobTitle.toLowerCase();
+
+                if (!jobTitleLower.contains(filterLang)) continue;
+
+                if ((exp == Experience.JUNIOR || exp == Experience.JUNIOR_PLUS)
+                        && (jobTitleLower.contains("middle") || jobTitleLower.contains("senior"))) {
                     continue;
                 }
 
-                String jobUrl   = attrOrEmpty(card.selectFirst("a.base-card__full-link"), "href");
-                String company  = textOrEmpty(card.selectFirst("h4.base-search-card__subtitle a"));
+                String jobUrl  = attrOrEmpty(card.selectFirst("a.base-card__full-link"), "href");
+                String company = textOrEmpty(card.selectFirst("h4.base-search-card__subtitle a"));
 
-                String companyImage = "";
-                Element imgEl = card.selectFirst("img.artdeco-entity-image.artdeco-entity-image--square-4");
-                if (imgEl != null) {
-                    String raw = imgEl.attr("data-delayed-url");
-                    companyImage = raw.replace("&amp;", "&");
-                }
+                Element imgEl = card.selectFirst("img.artdeco-entity-image--square-4");
+                String companyImage = imgEl != null
+                        ? imgEl.attr("data-delayed-url").replace("&amp;", "&")
+                        : "";
 
                 String description = "";
 
