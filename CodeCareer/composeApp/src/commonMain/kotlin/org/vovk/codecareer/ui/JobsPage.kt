@@ -74,9 +74,16 @@ fun JobsPage(windowSize: Float = 0.7f) {
                     JobCard(
                         job = job,
                         isTracked = isTracked,
-                        onTrackClick = { vacancy ->
-                            firebaseManager.toAddNewVacancyTrack(vacancy)
-                            // Refresh tracked vacancies
+                        onToggleTrack = { vacancy ->
+                            if (isTracked) {
+                                // Untrack vacancy
+                                val trackedVacancy = trackedVacancies.firstOrNull { it.jobInfo.jobUrl == vacancy.jobUrl }
+                                trackedVacancy?.let { firebaseManager.toDeleteTrackedVacancy(it) }
+                            } else {
+                                // Track vacancy
+                                firebaseManager.toAddNewVacancyTrack(vacancy)
+                            }
+                            // Refresh tracked vacancies list
                             firebaseManager.toGetTrackedVacancies { list ->
                                 trackedVacancies = list
                             }
@@ -93,7 +100,7 @@ fun JobsPage(windowSize: Float = 0.7f) {
 fun JobCard(
     job: JobCartEntity,
     isTracked: Boolean,
-    onTrackClick: (JobCartEntity) -> Unit
+    onToggleTrack: (JobCartEntity) -> Unit
 ) {
     val isLoggedIn = UserSessionManager.isLoggedIn()
     Card(
@@ -119,7 +126,7 @@ fun JobCard(
                 }
                 if (isLoggedIn) {
                     Button(
-                        onClick = { onTrackClick(job) },
+                        onClick = { onToggleTrack(job) },
                         modifier = Modifier.height(32.dp),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = if (isTracked) Color(0xFF4CAF50) else Color(17,18,20,255),
