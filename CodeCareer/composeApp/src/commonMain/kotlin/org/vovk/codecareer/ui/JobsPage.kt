@@ -21,11 +21,25 @@ import org.vovk.codecareer.dal.entities.JobCartEntity
 import org.vovk.codecareer.dal.firebase.FirebaseManager
 import org.vovk.codecareer.dal.firebase.UserSessionManager
 import org.vovk.codecareer.dal.vacancies.VacanciesEntityManager
+import org.vovk.codecareer.dal.entities.TrackedVacancy
+import androidx.compose.material.ButtonDefaults
 
 @Composable
 fun JobsPage(windowSize: Float = 0.7f) {
-
     var jobs by remember { mutableStateOf(VacanciesEntityManager.getVacancies()) }
+    // Load tracked vacancies for the logged-in user
+    val isLoggedIn = UserSessionManager.isLoggedIn()
+    val firebaseManager = remember { FirebaseManager() }
+    var trackedVacancies by remember { mutableStateOf<List<TrackedVacancy>>(emptyList()) }
+    DisposableEffect(isLoggedIn) {
+        if (isLoggedIn) {
+            firebaseManager.toGetTrackedVacancies { list ->
+                trackedVacancies = list
+            }
+        }
+        onDispose { }
+    }
+    val trackedUrls = trackedVacancies.map { it.jobInfo.jobUrl }.toSet()
 
     Column(
         modifier = Modifier.fillMaxWidth(windowSize),
@@ -56,7 +70,18 @@ fun JobsPage(windowSize: Float = 0.7f) {
         } else {
             LazyColumn {
                 items(jobs) { job ->
-                    JobCard(job)
+                    val isTracked = job.jobUrl in trackedUrls
+                    JobCard(
+                        job = job,
+                        isTracked = isTracked,
+                        onTrackClick = { vacancy ->
+                            firebaseManager.toAddNewVacancyTrack(vacancy)
+                            // Refresh tracked vacancies
+                            firebaseManager.toGetTrackedVacancies { list ->
+                                trackedVacancies = list
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -65,9 +90,12 @@ fun JobsPage(windowSize: Float = 0.7f) {
 
 
 @Composable
-fun JobCard(job: JobCartEntity) {
+fun JobCard(
+    job: JobCartEntity,
+    isTracked: Boolean,
+    onTrackClick: (JobCartEntity) -> Unit
+) {
     val isLoggedIn = UserSessionManager.isLoggedIn()
-    val firebaseAuth = remember { FirebaseManager() }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -91,11 +119,15 @@ fun JobCard(job: JobCartEntity) {
                 }
                 if (isLoggedIn) {
                     Button(
-                        onClick = {firebaseAuth.toAddNewVacancyTrack(job)},
+                        onClick = { onTrackClick(job) },
                         modifier = Modifier.height(32.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = if (isTracked) Color(0xFF4CAF50) else Color(17,18,20,255),
+                            contentColor = if (isTracked) Color.White else Color(199,194,200)
+                        ),
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                     ) {
-                        Text("Track", fontSize = 12.sp)
+                        Text(if (isTracked) "Tracked" else "Track", fontSize = 12.sp)
                     }
                 }
             }
