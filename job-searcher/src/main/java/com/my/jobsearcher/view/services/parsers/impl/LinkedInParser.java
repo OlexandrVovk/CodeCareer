@@ -26,7 +26,8 @@ public class LinkedInParser implements Parser {
     public List<ResponseDto> getVacancies(VacancyRequest vacancyRequest) {
         List<ResponseDto> vacancies = new ArrayList<>();
 
-        String keywords = URLEncoder.encode(vacancyRequest.getLang().name(), StandardCharsets.UTF_8);
+        String langDisplay = vacancyRequest.getLang().toString();
+        String keywords = URLEncoder.encode(langDisplay, StandardCharsets.UTF_8);
         String location = URLEncoder.encode("Ukraine", StandardCharsets.UTF_8);
         String url = BASE_URL + "?keywords=" + keywords + "&location=" + location;
 
@@ -43,6 +44,10 @@ public class LinkedInParser implements Parser {
                 if (card == null) continue;
 
                 String jobTitle = textOrEmpty(card.selectFirst("h3.base-search-card__title"));
+                if (!jobTitle.toLowerCase().contains(langDisplay.toLowerCase())) {
+                    continue;
+                }
+
                 String jobUrl   = attrOrEmpty(card.selectFirst("a.base-card__full-link"), "href");
                 String company  = textOrEmpty(card.selectFirst("h4.base-search-card__subtitle a"));
 
