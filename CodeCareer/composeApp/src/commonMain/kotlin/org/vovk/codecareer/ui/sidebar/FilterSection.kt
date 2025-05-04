@@ -2,6 +2,7 @@ package org.vovk.codecareer.ui.sidebar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -93,22 +94,16 @@ fun FilterCategoryButton(
     Button(
         onClick = onToggle,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (isSelected) Color.Green else Color(17,18,20,255)
+            backgroundColor = if (isSelected) Color(0xFF4CAF50) else Color(17,18,20,255),
+            contentColor = if (isSelected) Color.White else Color(199,194,200)
         ),
         shape = RoundedCornerShape(8.dp),
-        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
-        modifier = Modifier
-            .border(
-                width = 2.dp,
-                color = if (isSelected) Color.White else Color(57,60,64,255),
-                shape = RoundedCornerShape(8.dp)
-            )
+        border = BorderStroke(2.dp, if (isSelected) Color(0xFF4CAF50) else Color(57,60,64,255)),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(
             text = text,
-            fontSize = 14.sp,
-            color = Color(199,194,200),
-            modifier = Modifier.padding(0.dp) // Ensure text has no extra padding
+            fontSize = 14.sp
         )
     }
 }

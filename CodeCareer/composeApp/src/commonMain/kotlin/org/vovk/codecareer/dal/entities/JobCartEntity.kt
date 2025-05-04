@@ -17,9 +17,6 @@ data class TrackedVacancy(
     val jobInfo: JobCartEntity,
     var status: VacancyStatus = VacancyStatus.INTERESTED,
     var notes: String = "",
-    /**
-     * List of scheduled interviews for this vacancy.
-     */
     var interviewSchedules: List<InterviewSchedule> = emptyList()
 )
 
