@@ -27,9 +27,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.vovk.codecareer.dal.firebase.FirebaseManager
 
-external fun handleGoogleLogin(callback: (String) -> Unit)
-
-
 class LoginPage : Screen {
 
     // Validation helper functions

@@ -449,7 +449,7 @@ class TracksPage : Screen {
                 )
                 Text(
                     "View Details",
-                    color = Color(0xFF864AED),
+                    color = Color(30, 144, 255, 255),
                     fontSize = 12.sp,
                     modifier = Modifier
                         .padding(top = 4.dp)
@@ -555,7 +555,7 @@ class TracksPage : Screen {
                                     notesText = vacancy.notes
                                 }
                             ) {
-                                Text("Cancel")
+                                Text("Cancel", color = Color(30, 144, 255, 255))
                             }
                             TextButton(
                                 onClick = {
@@ -563,7 +563,7 @@ class TracksPage : Screen {
                                     editingNotes = false
                                 }
                             ) {
-                                Text("Save")
+                                Text("Save", color = Color(30, 144, 255, 255))
                             }
                         }
                     }
