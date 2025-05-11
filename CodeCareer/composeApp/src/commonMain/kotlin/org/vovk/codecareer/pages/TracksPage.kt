@@ -297,6 +297,8 @@ class TracksPage : Screen {
                                     var isVisible by remember { mutableStateOf(true) }
                                     var offsetX by remember { mutableStateOf(0f) }
                                     val deleteThreshold = -200f
+                                    // Swipe right threshold to open calendar dialog
+                                    val scheduleThreshold = 200f
 
                                     AnimatedVisibility(
                                         visible = isVisible,
@@ -325,23 +327,31 @@ class TracksPage : Screen {
                                                 }
                                             },
                                             onDrag = { delta ->
-                                                // Only allow dragging to the left (negative values)
-                                                if (offsetX + delta <= 0) {
-                                                    offsetX += delta
-                                                }
+                                                // Allow dragging in both directions
+                                                offsetX += delta
                                             },
                                             onDragEnd = {
-                                                if (offsetX < deleteThreshold) {
-                                                    // Trigger delete animation
-                                                    isVisible = false
-                                                    coroutineScope.launch {
-                                                        delay(300) // Wait for animation to complete
-                                                        trackedVacancies = trackedVacancies.filter { it != vacancy }
-                                                        firebaseManager.toDeleteTrackedVacancy(vacancy)
+                                                when {
+                                                    offsetX < deleteThreshold -> {
+                                                        // Trigger delete animation
+                                                        isVisible = false
+                                                        coroutineScope.launch {
+                                                            delay(300) // Wait for animation to complete
+                                                            trackedVacancies = trackedVacancies.filter { it != vacancy }
+                                                            firebaseManager.toDeleteTrackedVacancy(vacancy)
+                                                        }
                                                     }
-                                                } else {
-                                                    // Snap back
-                                                    offsetX = 0f
+                                                    offsetX > scheduleThreshold -> {
+                                                        // Open calendar dialog
+                                                        vacancyToSchedule = vacancy
+                                                        showCalendarDialog = true
+                                                        // Reset position
+                                                        offsetX = 0f
+                                                    }
+                                                    else -> {
+                                                        // Snap back
+                                                        offsetX = 0f
+                                                    }
                                                 }
                                             }
                                         )
@@ -689,32 +699,60 @@ class TracksPage : Screen {
             var cardHeight by remember { mutableStateOf(0.dp) }
             var cardWidth by remember { mutableStateOf(0.dp) }
 
-            // Delete background (visible when swiping)
+            // Swipe background (red for delete, blue for schedule)
             Box(
                 modifier = Modifier
                     .width(cardWidth)
                     .height(cardHeight)
                     .clip(cardShape)
-                    .background(Color.Red.copy(alpha = 0.8f)),
-                contentAlignment = Alignment.CenterEnd
+                    .background(
+                        if (offsetX > 0f)
+                            Color(30, 144, 255, 255).copy(alpha = 0.8f)
+                        else
+                            Color.Red.copy(alpha = 0.8f)
+                    ),
+                contentAlignment = if (offsetX > 0f) Alignment.CenterStart else Alignment.CenterEnd
             ) {
-                Row(
-                    modifier = Modifier.padding(end = 24.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = Color.White,
-                        modifier = Modifier.size(32.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "Delete",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
+                if (offsetX > 0f) {
+                    // Schedule background shows calendar icon on the left
+                    Row(
+                        modifier = Modifier.padding(start = 24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.DateRange,
+                            contentDescription = "Schedule",
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Schedule",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    }
+                } else {
+                    // Delete background shows trash icon on the right
+                    Row(
+                        modifier = Modifier.padding(end = 24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Delete",
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Delete",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    }
                 }
             }
 
@@ -771,7 +809,7 @@ class TracksPage : Screen {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             "View Details",
-                            color = Color(0xFF864AED),
+                            color = Color(30, 144, 255, 255),
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .clickable {
@@ -875,7 +913,7 @@ class TracksPage : Screen {
                                     notesText = vacancy.notes
                                 }
                             ) {
-                                Text("Cancel")
+                                Text("Cancel", color = Color(30, 144, 255, 255))
                             }
                             TextButton(
                                 onClick = {
@@ -883,7 +921,7 @@ class TracksPage : Screen {
                                     editingNotes = false
                                 }
                             ) {
-                                Text("Save")
+                                Text("Save", color = Color(30, 144, 255, 255))
                             }
                         }
                     } else {
