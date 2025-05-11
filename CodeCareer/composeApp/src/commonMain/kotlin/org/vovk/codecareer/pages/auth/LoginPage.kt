@@ -441,9 +441,6 @@ class LoginPage : Screen {
                             isLoading = false
                             navigator.popUntilRoot()
                         })
-//                        handleGoogleLogin { messageFromJs ->
-//                            println("Kotlin: Received message from JS event: '$messageFromJs'")
-//                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -460,7 +457,8 @@ class LoginPage : Screen {
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             text = "Continue with Google",
-                            fontSize = 16.sp,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
                             color = Color.DarkGray
                         )
                     }
@@ -482,7 +480,7 @@ class LoginPage : Screen {
                         text = "Register",
                         color = Color(30, 144, 255, 255),
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable { /* Navigate to registration page */ }
+                        modifier = Modifier.clickable { navigator.push(RegisterPage())  }
                     )
                 }
             }

@@ -46,34 +46,6 @@ class RegisterPage : Screen {
         return name.length >= 2
     }
 
-    private fun getPasswordStrength(password: String): PasswordStrength {
-        if (password.isEmpty()) return PasswordStrength.EMPTY
-
-        var strength = 0
-        if (password.length >= 8) strength++
-        if (password.any { it.isLowerCase() }) strength++
-        if (password.any { it.isUpperCase() }) strength++
-        if (password.any { it.isDigit() }) strength++
-        if (password.any { !it.isLetterOrDigit() }) strength++
-
-        return when(strength) {
-            1 -> PasswordStrength.WEAK
-            2 -> PasswordStrength.WEAK
-            3 -> PasswordStrength.MEDIUM
-            4 -> PasswordStrength.STRONG
-            5 -> PasswordStrength.VERY_STRONG
-            else -> PasswordStrength.EMPTY
-        }
-    }
-
-    enum class PasswordStrength(val color: Color) {
-        EMPTY(Color.Gray),
-        WEAK(Color.Red),
-        MEDIUM(Color(0xFFFFA500)), // Orange
-        STRONG(Color(0xFF4CAF50)), // Green
-        VERY_STRONG(Color(0xFF008000)) // Dark Green
-    }
-
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -141,9 +113,6 @@ class RegisterPage : Screen {
             }
         }
 
-        // Password strength
-        val passwordStrength = getPasswordStrength(password)
-
         // Clear auth error when fields change
         LaunchedEffect(email, password, confirmPassword, fullName) {
             if (registerError.isNotEmpty()) {
@@ -154,7 +123,7 @@ class RegisterPage : Screen {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colors.background),
+                .background(Color(15,15,17,255)),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -168,7 +137,7 @@ class RegisterPage : Screen {
                     text = "Create Account",
                     style = MaterialTheme.typography.h4,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colors.primary
+                    color = Color.White,
                 )
 
                 Text(
@@ -194,30 +163,20 @@ class RegisterPage : Screen {
                 OutlinedTextField(
                     value = fullName,
                     onValueChange = { fullName = it },
-                    label = { Text("Full Name") },
-                    placeholder = { Text("Enter your full name") },
+                    label = { Text("Full Name", color = Color.Gray) },
+                    placeholder = { Text("Enter your full name", color = Color.Gray) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Name Icon",
-                            tint = if (nameError.isEmpty() || !nameTouched) MaterialTheme.colors.primary else Color.Red
+                            tint = if (nameError.isEmpty() || !nameTouched) Color.Gray else Color.Red
                         )
                     },
-                    trailingIcon = {
-                        if (nameError.isNotEmpty() && nameTouched) {
-                            Icon(
-                                imageVector = Icons.Default.Warning,
-                                contentDescription = "Error",
-                                tint = Color.Red
-                            )
-                        } else if (fullName.isNotEmpty() && isValidName(fullName)) {
-                            Icon(
-                                imageVector = Icons.Default.Done,
-                                contentDescription = "Valid Name",
-                                tint = Color(0xFF4CAF50) // Green
-                            )
-                        }
-                    },
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.Gray,
+                        focusedBorderColor = Color(57, 60, 64, 255),
+                        unfocusedBorderColor = Color(57, 60, 64, 255)
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = if (nameError.isEmpty() || !nameTouched) 16.dp else 4.dp)
@@ -249,30 +208,20 @@ class RegisterPage : Screen {
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Email") },
-                    placeholder = { Text("Enter your email") },
+                    label = { Text("Email", color = Color.Gray) },
+                    placeholder = { Text("Enter your email", color = Color.Gray) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Email,
                             contentDescription = "Email Icon",
-                            tint = if (emailError.isEmpty() || !emailTouched) MaterialTheme.colors.primary else Color.Red
+                            tint = if (emailError.isEmpty() || !emailTouched) Color.Gray else Color.Red
                         )
                     },
-                    trailingIcon = {
-                        if (emailError.isNotEmpty() && emailTouched) {
-                            Icon(
-                                imageVector = Icons.Default.Warning,
-                                contentDescription = "Error",
-                                tint = Color.Red
-                            )
-                        } else if (email.isNotEmpty() && isValidEmail(email)) {
-                            Icon(
-                                imageVector = Icons.Default.Done,
-                                contentDescription = "Valid Email",
-                                tint = Color(0xFF4CAF50) // Green
-                            )
-                        }
-                    },
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.Gray,
+                        focusedBorderColor = Color(57, 60, 64, 255),
+                        unfocusedBorderColor = Color(57, 60, 64, 255)
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = if (emailError.isEmpty() || !emailTouched) 16.dp else 4.dp)
@@ -304,20 +253,26 @@ class RegisterPage : Screen {
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Password") },
-                    placeholder = { Text("Create a strong password") },
+                    label = { Text("Password", color = Color.Gray) },
+                    placeholder = { Text("Create a strong password", color = Color.Gray) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Lock,
                             contentDescription = "Password Icon",
-                            tint = if (passwordError.isEmpty() || !passwordTouched) MaterialTheme.colors.primary else Color.Red
+                            tint = if (passwordError.isEmpty() || !passwordTouched) Color.Gray else Color.Red
                         )
                     },
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.Gray,
+                        focusedBorderColor = Color(57, 60, 64, 255),
+                        unfocusedBorderColor = Color(57, 60, 64, 255)
+                    ),
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
-                                imageVector = if (passwordVisible) Icons.Default.Done else Icons.Default.Warning,
-                                contentDescription = if (passwordVisible) "Hide Password" else "Show Password"
+                                imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                                tint = if (passwordError.isEmpty() || !passwordTouched) Color.Gray else Color.Red
                             )
                         }
                     },
@@ -394,20 +349,26 @@ class RegisterPage : Screen {
                 OutlinedTextField(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
-                    label = { Text("Confirm Password") },
-                    placeholder = { Text("Confirm your password") },
+                    label = { Text("Confirm Password", color = Color.Gray) },
+                    placeholder = { Text("Confirm your password", color = Color.Gray) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Lock,
                             contentDescription = "Confirm Password Icon",
-                            tint = if (confirmPasswordError.isEmpty() || !confirmPasswordTouched) MaterialTheme.colors.primary else Color.Red
+                            tint = if (confirmPasswordError.isEmpty() || !confirmPasswordTouched) Color.Gray else Color.Red
                         )
                     },
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.Gray,
+                        focusedBorderColor = Color(57, 60, 64, 255),
+                        unfocusedBorderColor = Color(57, 60, 64, 255)
+                    ),
                     trailingIcon = {
-                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
-                                imageVector = if (confirmPasswordVisible) Icons.Default.Done else Icons.Default.Warning,
-                                contentDescription = if (confirmPasswordVisible) "Hide Password" else "Show Password"
+                                imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                                tint = if (passwordError.isEmpty() || !passwordTouched) Color.Gray else Color.Red
                             )
                         }
                     },
@@ -495,7 +456,8 @@ class RegisterPage : Screen {
                         Text(
                             text = "Create Account",
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = Color.DarkGray
                         )
                     }
                 }
@@ -514,7 +476,7 @@ class RegisterPage : Screen {
                     )
                     Text(
                         text = "Sign in",
-                        color = MaterialTheme.colors.primary,
+                        color = Color(30, 144, 255, 255),
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable { navigator.push(LoginPage()) }
                     )
