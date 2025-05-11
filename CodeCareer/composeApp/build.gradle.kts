@@ -33,12 +33,13 @@ kotlin {
         binaries.executable()
     }
     
-    sourceSets {
+        sourceSets {
         commonMain.dependencies {
             val voyagerVersion = "1.1.0-beta03"
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
+            implementation(compose.materialIconsExtended)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)

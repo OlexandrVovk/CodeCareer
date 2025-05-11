@@ -160,10 +160,13 @@ fun TopAppBar(
                     // Login/Register buttons
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = onNavigateToLogin) {
-                            Text("Login", color = Color(199, 194, 200))
+                            Text("Login",
+                                color = Color(199, 194, 200),
+                                fontSize = 16.sp)
                         }
                         IconButton(onClick = onNavigateToRegister) {
-                            Text("Register", color = Color(199, 194, 200))
+                            Text("Register", color = Color(199, 194, 200),
+                                fontSize = 16.sp)
                         }
                     }
                 }
