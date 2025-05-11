@@ -36,6 +36,7 @@ class JobSearchPage: Screen {
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     JobsPage(0.65f)
+                    // Desktop: standard filter section, no overlay closing
                     FilterSection()
                 }
             }
@@ -70,7 +71,8 @@ class JobSearchPage: Screen {
                         .fillMaxSize()
                         .background(Color(15,15,17,255))
                 ) {
-                    FilterSection()
+                    // Overlay mode: close overlay when applying filters
+                    FilterSection(onApply = { setFilterOverlayVisible(false)})
                     // "Filters" button at the bottom
                     Button(
                         onClick = { setFilterOverlayVisible(!isFilterOverlayVisible) },

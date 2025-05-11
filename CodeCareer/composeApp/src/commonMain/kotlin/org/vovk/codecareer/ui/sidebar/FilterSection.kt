@@ -21,7 +21,9 @@ import org.vovk.codecareer.dal.enums.WorkingExperience
 import org.vovk.codecareer.dal.filters.FilterStateManager
 
 @Composable
-fun FilterSection() {
+fun FilterSection(
+    onApply: () -> Unit = {}
+) {
     // Create a FilterStateManager to handle filter state
     val filterStateManager = remember { FilterStateManager() }
     Box(modifier = Modifier
@@ -48,13 +50,17 @@ fun FilterSection() {
 
             Text("Employment", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(199,194,200))
             EmploymentFilterButtons(filterStateManager)
-            ApplyFiltersOrClear(filterStateManager)
+            ApplyFiltersOrClear(
+                filterStateManager = filterStateManager,
+                onApply = onApply
+            )
         }
     }
 }
 
 @Composable
-fun ApplyFiltersOrClear(filterStateManager: FilterStateManager) {
+fun ApplyFiltersOrClear(filterStateManager: FilterStateManager,
+                        onApply: () -> Unit = {}) {
     // Action buttons row
     Row(
         modifier = Modifier
@@ -63,7 +69,7 @@ fun ApplyFiltersOrClear(filterStateManager: FilterStateManager) {
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Button(
-            onClick = { filterStateManager.applyFilters() },
+            onClick = { filterStateManager.applyFilters(); onApply()},
             modifier = Modifier.weight(1f),
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color(0xFF4CAF50)
