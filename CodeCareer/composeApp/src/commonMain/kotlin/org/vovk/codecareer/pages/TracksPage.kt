@@ -58,7 +58,6 @@ class TracksPage : Screen {
         var errorMessage by remember { mutableStateOf<String?>(null) }
 
         // State for delete confirmation dialog
-        var showDeleteDialog by remember { mutableStateOf(false) }
         var vacancyToDelete by remember { mutableStateOf<TrackedVacancy?>(null) }
 
         // State for calendar dialog
@@ -85,23 +84,6 @@ class TracksPage : Screen {
                 trackedVacancies = vacancies
                 isLoading = false
             }
-        }
-
-        // Delete confirmation dialog
-        if (showDeleteDialog && vacancyToDelete != null) {
-            DeleteConfirmationDialog(
-                vacancy = vacancyToDelete!!,
-                onConfirm = {
-                    trackedVacancies = trackedVacancies.filter { it != vacancyToDelete }
-                    firebaseManager.toDeleteTrackedVacancy(vacancyToDelete!!)
-                    vacancyToDelete = null
-                    showDeleteDialog = false
-                },
-                onDismiss = {
-                    vacancyToDelete = null
-                    showDeleteDialog = false
-                }
-            )
         }
 
         // Calendar dialog
@@ -283,7 +265,9 @@ class TracksPage : Screen {
                                         },
                                         onDeleteClick = {
                                             vacancyToDelete = vacancy
-                                            showDeleteDialog = true
+                                            trackedVacancies = trackedVacancies.filter { it != vacancyToDelete }
+                                            firebaseManager.toDeleteTrackedVacancy(vacancyToDelete!!)
+                                            vacancyToDelete = null
                                         },
                                         onCalendarClick = {
                                             vacancyToSchedule = vacancy
@@ -934,55 +918,6 @@ class TracksPage : Screen {
         }
     }
 
-
-    @Composable
-    fun DeleteConfirmationDialog(
-        vacancy: TrackedVacancy,
-        onConfirm: () -> Unit,
-        onDismiss: () -> Unit
-    ) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = {
-                Text("Delete Tracked Vacancy")
-            },
-            text = {
-                Column {
-                    Text("Are you sure you want to delete this vacancy from your tracking list?")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = vacancy.jobInfo.jobName,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "at ${vacancy.jobInfo.companyName}",
-                        color = Color.Gray
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "This action cannot be undone.",
-                        color = Color.Red
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = onConfirm,
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color.Red,
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text("Delete")
-                }
-            },
-            dismissButton = {
-                OutlinedButton(onClick = onDismiss) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
 
     private fun getStatusColor(status: VacancyStatus): Color {
         return when (status) {
