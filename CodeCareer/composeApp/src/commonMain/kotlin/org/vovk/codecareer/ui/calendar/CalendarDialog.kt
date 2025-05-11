@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.ArrowBack
 import org.vovk.codecareer.dal.enums.InterviewType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -160,16 +162,50 @@ fun CalendarDialog(
         },
         text = {
             Column(modifier = Modifier.padding(8.dp)) {
-                // Vacancy info - always visible
-                Text(
-                    text = vacancy.jobInfo.jobName,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = "at ${vacancy.jobInfo.companyName}",
-                    color = Color(199, 194, 200)
-                )
+                if (currentStep == CalendarStep.DATE_SELECTION) {
+                    // Vacancy info - always visible
+                    Text(
+                        text = vacancy.jobInfo.jobName,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "at ${vacancy.jobInfo.companyName}",
+                        color = Color(199, 194, 200)
+                    )
+                } else {
+                    // Vacancy info - with back navigation
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(
+                            onClick = {
+                                when (currentStep) {
+                                    CalendarStep.TIME_SELECTION -> currentStep = CalendarStep.DATE_SELECTION
+                                    CalendarStep.EVENT_SUMMARY -> currentStep = CalendarStep.TIME_SELECTION
+                                    else -> {}
+                                }
+                            }
+                        ) {
+                            Icon(
+                                Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            Text(
+                                text = vacancy.jobInfo.jobName,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "at ${vacancy.jobInfo.companyName}",
+                                color = Color(199, 194, 200)
+                            )
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Date Selection Step

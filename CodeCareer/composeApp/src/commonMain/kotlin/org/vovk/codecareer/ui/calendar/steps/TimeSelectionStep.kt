@@ -86,21 +86,6 @@ fun TimeSelectionStep(
                 .padding(top = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
-            OutlinedButton(
-                onClick = onBack,
-                modifier = Modifier
-                    .size(width = 100.dp, height = 44.dp)
-                    .border(
-                        width = 2.dp,
-                        color = Color(57,60,64,255),
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(17,18,20,255)
-                )
-            ) {
-                Text("Back")
-            }
 
             OutlinedButton(
                 onClick = onCancel,
