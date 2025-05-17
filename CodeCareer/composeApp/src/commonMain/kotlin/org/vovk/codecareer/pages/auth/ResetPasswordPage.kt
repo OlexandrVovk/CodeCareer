@@ -157,12 +157,16 @@ class ResetPasswordPage : Screen {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        disabledBackgroundColor = Color.White
+                    ),
                     shape = RoundedCornerShape(12.dp),
                     enabled = !isLoading && email.isNotEmpty() && emailError.isEmpty()
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
-                            color = Color.White,
+                            color = Color.DarkGray,
                             modifier = Modifier.size(24.dp)
                         )
                     } else {

@@ -364,10 +364,10 @@ class RegisterPage : Screen {
                         unfocusedBorderColor = Color(57, 60, 64, 255)
                     ),
                     trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                             Icon(
-                                imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                                imageVector = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password",
                                 tint = if (passwordError.isEmpty() || !passwordTouched) Color.Gray else Color.Red
                             )
                         }
@@ -445,11 +445,15 @@ class RegisterPage : Screen {
                             nameError.isEmpty() &&
                             emailError.isEmpty() &&
                             passwordError.isEmpty() &&
-                            confirmPasswordError.isEmpty()
+                            confirmPasswordError.isEmpty(),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        disabledBackgroundColor = Color.White
+                    )
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
-                            color = Color.White,
+                            color = Color.DarkGray,
                             modifier = Modifier.size(24.dp)
                         )
                     } else {

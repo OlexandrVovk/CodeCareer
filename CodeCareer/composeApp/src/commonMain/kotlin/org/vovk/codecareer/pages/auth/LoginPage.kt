@@ -1,7 +1,6 @@
 package org.vovk.codecareer.pages.auth
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,7 +25,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.vovk.codecareer.dal.firebase.FirebaseManager
-import org.vovk.codecareer.pages.auth.ResetPasswordPage
 
 class LoginPage : Screen {
 
@@ -36,40 +34,9 @@ class LoginPage : Screen {
         return email.isNotEmpty() && emailRegex.matches(email)
     }
 
+    // Simplified: only require non-empty password
     private fun isValidPassword(password: String): Boolean {
-        return password.length >= 8 &&
-                password.any { it.isLowerCase() } &&
-                password.any { it.isUpperCase() } &&
-                password.any { it.isDigit() } &&
-                password.any { !it.isLetterOrDigit() }
-    }
-
-    private fun getPasswordStrength(password: String): PasswordStrength {
-        if (password.isEmpty()) return PasswordStrength.EMPTY
-
-        var strength = 0
-        if (password.length >= 8) strength++
-        if (password.any { it.isLowerCase() }) strength++
-        if (password.any { it.isUpperCase() }) strength++
-        if (password.any { it.isDigit() }) strength++
-        if (password.any { !it.isLetterOrDigit() }) strength++
-
-        return when(strength) {
-            1 -> PasswordStrength.WEAK
-            2 -> PasswordStrength.WEAK
-            3 -> PasswordStrength.MEDIUM
-            4 -> PasswordStrength.STRONG
-            5 -> PasswordStrength.VERY_STRONG
-            else -> PasswordStrength.EMPTY
-        }
-    }
-
-    enum class PasswordStrength(val color: Color) {
-        EMPTY(Color.Gray),
-        WEAK(Color.Red),
-        MEDIUM(Color(0xFFFFA500)), // Orange
-        STRONG(Color(0xFF4CAF50)), // Green
-        VERY_STRONG(Color(0xFF008000)) // Dark Green
+        return password.isNotEmpty()
     }
 
     @Composable
@@ -109,9 +76,6 @@ class LoginPage : Screen {
                 }
             }
         }
-
-        // Password strength
-        val passwordStrength = getPasswordStrength(password)
 
         // Clear auth error when fields change
         LaunchedEffect(email, password) {
@@ -177,21 +141,6 @@ class LoginPage : Screen {
                         focusedBorderColor = Color(57, 60, 64, 255),
                         unfocusedBorderColor = Color(57, 60, 64, 255)
                     ),
-//                    trailingIcon = {
-//                        if (emailError.isNotEmpty() && emailTouched) {
-//                            Icon(
-//                                imageVector = Icons.Default.Warning,
-//                                contentDescription = "Error",
-//                                tint = Color.Red
-//                            )
-//                        } else if (email.isNotEmpty() && isValidEmail(email)) {
-//                            Icon(
-//                                imageVector = Icons.Default.Done,
-//                                contentDescription = "Valid Email",
-//                                tint = Color(0xFF4CAF50) // Green
-//                            )
-//                        }
-//                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = if (emailError.isEmpty() || !emailTouched) 16.dp else 4.dp)
@@ -274,87 +223,6 @@ class LoginPage : Screen {
                     )
                 }
 
-                // Password strength indicator
-                if (password.isNotEmpty() && passwordTouched) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Password strength: ",
-                            style = MaterialTheme.typography.caption,
-                            color = Color.Gray
-                        )
-                        Text(
-                            text = when(passwordStrength) {
-                                PasswordStrength.EMPTY -> ""
-                                PasswordStrength.WEAK -> "Weak"
-                                PasswordStrength.MEDIUM -> "Medium"
-                                PasswordStrength.STRONG -> "Strong"
-                                PasswordStrength.VERY_STRONG -> "Very Strong"
-                            },
-                            style = MaterialTheme.typography.caption,
-                            color = passwordStrength.color,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        LinearProgressIndicator(
-                            progress = when(passwordStrength) {
-                                PasswordStrength.EMPTY -> 0f
-                                PasswordStrength.WEAK -> 0.2f
-                                PasswordStrength.MEDIUM -> 0.5f
-                                PasswordStrength.STRONG -> 0.8f
-                                PasswordStrength.VERY_STRONG -> 1f
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(4.dp),
-                            color = passwordStrength.color,
-                            backgroundColor = Color.LightGray
-                        )
-                    }
-
-                    // Password requirements list
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = "Password must have:",
-                            style = MaterialTheme.typography.caption,
-                            color = Color.Gray
-                        )
-
-                        PasswordRequirement(
-                            text = "At least 8 characters",
-                            satisfied = password.length >= 8
-                        )
-
-                        PasswordRequirement(
-                            text = "At least 1 lowercase letter (a-z)",
-                            satisfied = password.any { it.isLowerCase() }
-                        )
-
-                        PasswordRequirement(
-                            text = "At least 1 uppercase letter (A-Z)",
-                            satisfied = password.any { it.isUpperCase() }
-                        )
-
-                        PasswordRequirement(
-                            text = "At least 1 number (0-9)",
-                            satisfied = password.any { it.isDigit() }
-                        )
-
-                        PasswordRequirement(
-                            text = "At least 1 special character (!@#\$%^&*...)",
-                            satisfied = password.any { !it.isLetterOrDigit() }
-                        )
-                    }
-                }
-
                 // Forgot Password Text
                 Text(
                     text = "Forgot Password?",
@@ -393,12 +261,15 @@ class LoginPage : Screen {
                         .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(12.dp),
-                    enabled = !isLoading && email.isNotEmpty() && password.isNotEmpty() &&
-                            emailError.isEmpty() && passwordError.isEmpty()
+                    enabled = !isLoading && email.isNotEmpty() && password.isNotEmpty() && emailError.isEmpty(),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        disabledBackgroundColor = Color.White
+                    )
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
-                            color = Color.White,
+                            color = Color.DarkGray,
                             modifier = Modifier.size(24.dp)
                         )
                     } else {
@@ -444,8 +315,9 @@ class LoginPage : Screen {
                         .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        backgroundColor = Color.White
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        disabledBackgroundColor = Color.White
                     )
                 ) {
                     Row(
