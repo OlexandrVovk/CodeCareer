@@ -46,7 +46,7 @@ fun JobsPage(windowSize: Float = 0.7f) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Вакансії: ${jobs.size}",
+            text = "Vacancies: ${jobs.size}",
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp),

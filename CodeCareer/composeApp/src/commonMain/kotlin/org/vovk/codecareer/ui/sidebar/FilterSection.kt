@@ -38,12 +38,12 @@ fun FilterSection(
         .padding(25.dp)
     ){
         Column{
-            Text("Категорія", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(199,194,200))
+            Text("Technology", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(199,194,200))
             JobCategoryFilterButtons(filterStateManager)
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("Досвід роботи", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(199,194,200))
+            Text("Experience level", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(199,194,200))
             WorkingExperienceFilterButtons(filterStateManager)
 
             Spacer(modifier = Modifier.height(16.dp))
