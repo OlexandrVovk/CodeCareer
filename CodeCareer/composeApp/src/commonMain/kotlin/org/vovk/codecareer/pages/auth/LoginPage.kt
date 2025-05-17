@@ -86,6 +86,8 @@ class LoginPage : Screen {
         // Track if fields have been touched
         var emailTouched by remember { mutableStateOf(false) }
         var passwordTouched by remember { mutableStateOf(false) }
+        var resetMessage by remember { mutableStateOf<String?>(null) }
+        var resetError by remember { mutableStateOf(false) }
 
         // Validate email when touched
         LaunchedEffect(email, emailTouched) {
@@ -361,9 +363,34 @@ class LoginPage : Screen {
                     modifier = Modifier
                         .align(Alignment.End)
                         .padding(bottom = 24.dp)
-                        .clickable { /* Handle password reset */ },
+                        .clickable {
+                            if (isValidEmail(email)) {
+                                firebaseAuth.resetPassword(email) { success, errMsg ->
+                                    resetError = !success
+                                    resetMessage = if (success) {
+                                        "Check your inbox for reset instructions."
+                                    } else {
+                                        errMsg ?: "Failed to send reset email."
+                                    }
+                                }
+                            } else {
+                                resetError = true
+                                resetMessage = "Please enter a valid email to reset password."
+                            }
+                        },
                     fontWeight = FontWeight.Medium
                 )
+                resetMessage?.let { msg ->
+                    Text(
+                        text = msg,
+                        color = if (resetError) Color.Red else Color(0xFF4CAF50),
+                        style = MaterialTheme.typography.caption,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 24.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
 
                 // Login Button
                 Button(

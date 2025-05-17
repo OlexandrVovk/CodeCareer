@@ -17,6 +17,7 @@ external fun createUserWithEmail(email: String, password: String, displayName: S
 external fun signInWithEmail(email: String, password: String, callback: (String) -> Unit)
 external fun handleGoogleLogin(callback: (String) -> Unit)
 external fun signOut()
+external fun sendPasswordResetEmail(email: String, callback: (String) -> Unit)
 
 // Vacancies JS functions declaration
 external fun addNewVacancyTrack(companyName: String,
@@ -95,6 +96,27 @@ class FirebaseManager {
     fun toSignOut() {
         signOut()
         UserSessionManager.clearUserSession()
+    }
+    /**
+     * Send a password reset email to the given [email].
+     * @param callback invoked with (success, errorMessage)
+     */
+    fun resetPassword(email: String, callback: (Boolean, String?) -> Unit) {
+        sendPasswordResetEmail(email) { response ->
+            if (response.contains("\"success\":true")) {
+                callback(true, null)
+            } else {
+                val errorStart = response.indexOf("\"message\":\"")
+                val errorMessage = if (errorStart >= 0) {
+                    val start = errorStart + 11
+                    val end = response.indexOf("\"", start)
+                    if (end >= 0) response.substring(start, end) else "Unknown error"
+                } else {
+                    "Failed to send password reset email"
+                }
+                callback(false, errorMessage)
+            }
+        }
     }
 
     fun toAddNewVacancyTrack(vacancy: JobCartEntity){

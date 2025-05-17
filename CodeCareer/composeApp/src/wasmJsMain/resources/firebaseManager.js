@@ -51,6 +51,27 @@ function ensureInitialized() {
         });
     });
 }
+/**
+ * Send a password reset email via Firebase Auth
+ */
+function sendPasswordResetEmail(email, kotlinCallback) {
+    ensureInitialized()
+        .then(() => import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js'))
+        .then(firebaseAuthModule => {
+            return firebaseAuthModule.sendPasswordResetEmail(auth, email);
+        })
+        .then(() => {
+            kotlinCallback(JSON.stringify({ success: true }));
+        })
+        .catch(error => {
+            console.error("Password reset error:", error);
+            kotlinCallback(JSON.stringify({
+                success: false,
+                code: error.code,
+                message: getErrorMessage(error.code)
+            }));
+        });
+}
 
 function handleGoogleLogin(kotlinCallback) {
     ensureInitialized()
@@ -713,3 +734,4 @@ globalThis.updateTrackedVacancy = updateTrackedVacancy;
 globalThis.deleteTrackedVacancy = deleteTrackedVacancy;
 globalThis.scheduleInterview = scheduleInterview;
 globalThis.deleteMeeting = deleteMeeting;
+globalThis.sendPasswordResetEmail = sendPasswordResetEmail;
