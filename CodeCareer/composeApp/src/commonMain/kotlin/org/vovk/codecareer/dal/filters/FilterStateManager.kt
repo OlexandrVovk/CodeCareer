@@ -16,7 +16,6 @@ class FilterStateManager {
     private val selectedCategories: SnapshotStateList<JobCategory> = mutableStateListOf()
     private val selectedExperiences: SnapshotStateList<WorkingExperience> = mutableStateListOf()
     private val selectedEmploymentTypes: SnapshotStateList<EmploymentType> = mutableStateListOf()
-    private val vacancyServiceUrl: String = "http://localhost:3000/?"
 
     fun toggleCategory(category: JobCategory) {
         if (selectedCategories.contains(category)) {
@@ -24,7 +23,6 @@ class FilterStateManager {
         } else {
             selectedCategories.add(category)
         }
-        printCurrentFilters()
     }
 
     fun toggleExperience(experience: WorkingExperience) {
@@ -33,7 +31,6 @@ class FilterStateManager {
         } else {
             selectedExperiences.add(experience)
         }
-        printCurrentFilters()
     }
 
     fun toggleEmploymentType(employmentType: EmploymentType) {
@@ -42,7 +39,6 @@ class FilterStateManager {
         } else {
             selectedEmploymentTypes.add(employmentType)
         }
-        printCurrentFilters()
     }
 
     fun isCategorySelected(category: JobCategory): Boolean {
@@ -63,11 +59,6 @@ class FilterStateManager {
             experiences = selectedExperiences.toList(),
             employmentTypes = selectedEmploymentTypes.toList()
         )
-    }
-
-    private fun printCurrentFilters() {
-        val filterDataEntity = getFilterDataEntity()
-        println("Current Filters: $filterDataEntity")
     }
 
     fun applyFilters() {

@@ -64,7 +64,6 @@ class FirebaseManager {
                 callback(false, errorMessage)
             }
         }
-        println("Registering with email: $email")
     }
 
     fun signInWithEmail(
@@ -126,9 +125,7 @@ class FirebaseManager {
             jobName = vacancy.jobName,
             jobDescription = vacancy.jobDescription,
             jobUrl = vacancy.jobUrl
-        ){response ->
-            println(response)
-        }
+        ){response -> }
     }
 
     fun toGetTrackedVacancies(callback: (List<TrackedVacancy>) -> Unit) {
@@ -192,7 +189,6 @@ class FirebaseManager {
                                                     notes = scheduleNotes
                                                 )
                                             } catch (e: Exception) {
-                                                println("Error parsing interview schedule: ${e.message}")
                                                 null
                                             }
                                         } ?: run {
@@ -229,25 +225,19 @@ class FirebaseManager {
                                     null
                                 }
                             } catch (e: Exception) {
-                                println("Error parsing vacancy: ${e.message}")
                                 null
                             }
                         }
 
-                        println("Successfully parsed ${trackedVacancies.size} tracked vacancies")
                         callback(trackedVacancies)
                     } else {
-                        println("No vacancies array found in response")
                         callback(emptyList())
                     }
                 } else {
                     // Handle error
-                    val errorMessage = jsonObject["message"]?.jsonPrimitive?.content
-                    println("Error retrieving tracked vacancies: $errorMessage")
                     callback(emptyList())
                 }
             } catch (e: Exception) {
-                println("Error parsing tracked vacancies response: ${e.message}")
                 callback(emptyList())
             }
         }

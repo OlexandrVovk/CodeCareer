@@ -64,7 +64,6 @@ function sendPasswordResetEmail(email, kotlinCallback) {
             kotlinCallback(JSON.stringify({ success: true }));
         })
         .catch(error => {
-            console.error("Password reset error:", error);
             kotlinCallback(JSON.stringify({
                 success: false,
                 code: error.code,
@@ -100,7 +99,6 @@ function handleGoogleLogin(kotlinCallback) {
             kotlinCallback(userJson);
         })
         .catch((error) => {
-            console.error("Google auth error:", error);
 
             // Dispatch login error event
             window.dispatchEvent(new CustomEvent('googleLoginResult', {
@@ -140,7 +138,6 @@ function createUserWithEmail(email, password, displayName, callback) {
             callback(userJson);
         })
         .catch((error) => {
-            console.error("Email registration error:", error);
             // Handle registration errors
             const errorJson = JSON.stringify({
                 success: false,
@@ -172,7 +169,6 @@ function signInWithEmail(email, password, callback) {
             callback(userJson);
         })
         .catch((error) => {
-            console.error("Email sign-in error:", error);
             // Handle sign-in errors
             const errorJson = JSON.stringify({
                 success: false,
@@ -190,12 +186,6 @@ function signOut() {
             .then((firebaseAuthModule) => {
                 return firebaseAuthModule.signOut(auth);
             })
-            .then(() => {
-                console.log("User signed out successfully");
-            })
-            .catch((error) => {
-                console.error("Sign out error:", error);
-            });
     })
 }
 
@@ -232,7 +222,6 @@ function signInFromSession(uid, displayName, email, callback) {
             const currentUser = auth.currentUser;
 
             if (currentUser) {
-                console.log("User already signed in:", currentUser.email);
                 // User is already signed in - just return their info
                 const userJson = JSON.stringify({
                     success: true,
@@ -245,7 +234,6 @@ function signInFromSession(uid, displayName, email, callback) {
                 return;
             }
 
-            console.log("No user currently signed in, attempting to restore session");
 
             // Since we can't sign in anonymously and we don't have the password,
             // we'll use the persistent session that Firebase maintains
@@ -253,7 +241,6 @@ function signInFromSession(uid, displayName, email, callback) {
             // Set persistence to LOCAL (browser persistence)
             firebaseAuthModule.setPersistence(auth, firebaseAuthModule.browserLocalPersistence)
                 .then(() => {
-                    console.log("Persistence set to LOCAL");
 
                     // Instead of trying to sign in again, we'll check if Firebase
                     // can restore the auth state on its own
@@ -263,7 +250,6 @@ function signInFromSession(uid, displayName, email, callback) {
                         unsubscribe(); // Unsubscribe immediately after first callback
 
                         if (user) {
-                            console.log("Firebase restored auth state for:", user.email);
                             // Firebase restored the auth state
                             const userJson = JSON.stringify({
                                 success: true,
@@ -274,7 +260,6 @@ function signInFromSession(uid, displayName, email, callback) {
                             });
                             callback(userJson);
                         } else {
-                            console.log("Firebase could not restore auth state");
                             // Firebase couldn't restore auth state
                             // Return session data with a warning
                             const userJson = JSON.stringify({
@@ -291,7 +276,6 @@ function signInFromSession(uid, displayName, email, callback) {
 
                     // Set a timeout in case the auth state change doesn't fire
                     setTimeout(() => {
-                        console.log("Auth state change timeout - returning session data");
                         const userJson = JSON.stringify({
                             success: true,
                             uid: uid,
@@ -304,7 +288,6 @@ function signInFromSession(uid, displayName, email, callback) {
                     }, 3000); // 3 second timeout
                 })
                 .catch((error) => {
-                    console.error("Error setting persistence:", error);
                     // Return session data with a warning
                     const userJson = JSON.stringify({
                         success: true,
@@ -318,7 +301,6 @@ function signInFromSession(uid, displayName, email, callback) {
                 });
         })
         .catch((error) => {
-            console.error("Error initializing Firebase for session sign-in:", error);
             const errorJson = JSON.stringify({
                 success: false,
                 error: true,
@@ -348,8 +330,6 @@ function addNewVacancyTrack(companyName, companyImageUrl, jobName, jobDescriptio
                 return;
             }
 
-            console.log("Current user:", user.email);
-
             // Initialize Firestore
             const firestore = firestoreModule.getFirestore(firebaseApp);
 
@@ -363,8 +343,6 @@ function addNewVacancyTrack(companyName, companyImageUrl, jobName, jobDescriptio
                 firestore,
                 `users/${user.email}/tracked_vacancies/${encodedJobUrl}`
             );
-
-            console.log(`Attempting to write to: users/${user.email}/tracked_vacancies/${encodedJobUrl}`);
 
             // Create the vacancy data
             const vacancyData = {
@@ -383,7 +361,6 @@ function addNewVacancyTrack(companyName, companyImageUrl, jobName, jobDescriptio
             firestoreModule.setDoc(vacancyRef, vacancyData)
                 .then(() => {
                     // Success
-                    console.log("Vacancy tracked successfully");
                     callback(JSON.stringify({
                         success: true,
                         message: "Vacancy tracked successfully"
@@ -391,7 +368,6 @@ function addNewVacancyTrack(companyName, companyImageUrl, jobName, jobDescriptio
                 })
                 .catch((error) => {
                     // Error
-                    console.error("Error tracking vacancy:", error);
                     callback(JSON.stringify({
                         success: false,
                         error: true,
@@ -402,7 +378,6 @@ function addNewVacancyTrack(companyName, companyImageUrl, jobName, jobDescriptio
         })
         .catch((error) => {
             // Error importing Firestore
-            console.error("Error importing Firestore:", error);
             callback(JSON.stringify({
                 success: false,
                 error: true,
@@ -430,8 +405,6 @@ function getTrackedVacancies(callback) {
                 }));
                 return;
             }
-
-            console.log("Getting tracked vacancies for user:", user.email);
 
             // Initialize Firestore
             const firestore = firestoreModule.getFirestore(firebaseApp);
@@ -466,8 +439,6 @@ function getTrackedVacancies(callback) {
                         });
                     });
 
-                    console.log(`Retrieved ${vacancies.length} tracked vacancies`);
-
                     // Return the vacancies as JSON string
                     callback(JSON.stringify({
                         success: true,
@@ -475,7 +446,6 @@ function getTrackedVacancies(callback) {
                     }));
                 })
                 .catch((error) => {
-                    console.error("Error getting tracked vacancies:", error);
                     callback(JSON.stringify({
                         success: false,
                         error: true,
@@ -485,7 +455,6 @@ function getTrackedVacancies(callback) {
                 });
         })
         .catch((error) => {
-            console.error("Error importing Firestore:", error);
             callback(JSON.stringify({
                 success: false,
                 error: true,
@@ -503,12 +472,9 @@ function updateTrackedVacancy(jobUrl, status, notes, callback) {
             const user = auth.currentUser;
 
             if (!user) {
-                console.error("User not authenticated");
                 callback(false);
                 return;
             }
-
-            console.log(`Updating vacancy for user: ${user.email}, job URL: ${jobUrl}`);
 
             // Initialize Firestore
             const firestore = firestoreModule.getFirestore(firebaseApp);
@@ -533,16 +499,13 @@ function updateTrackedVacancy(jobUrl, status, notes, callback) {
             // Update the document in Firestore
             firestoreModule.updateDoc(vacancyRef, updateData)
                 .then(() => {
-                    console.log("Vacancy updated successfully");
                     callback(true);
                 })
                 .catch((error) => {
-                    console.error("Error updating vacancy:", error);
                     callback(false);
                 });
         })
         .catch((error) => {
-            console.error("Error importing Firestore:", error);
             callback(false);
         });
 }
@@ -559,12 +522,9 @@ function deleteTrackedVacancy(jobUrl, callback) {
             const user = auth.currentUser;
 
             if (!user) {
-                console.error("User not authenticated");
                 callback(false);
                 return;
             }
-
-            console.log(`Deleting vacancy for user: ${user.email}, job URL: ${jobUrl}`);
 
             // Initialize Firestore
             const firestore = firestoreModule.getFirestore(firebaseApp);
@@ -582,16 +542,13 @@ function deleteTrackedVacancy(jobUrl, callback) {
             // Delete the document from Firestore
             firestoreModule.deleteDoc(vacancyRef)
                 .then(() => {
-                    console.log("Vacancy deleted successfully");
                     callback(true);
                 })
                 .catch((error) => {
-                    console.error("Error deleting vacancy:", error);
                     callback(false);
                 });
         })
         .catch((error) => {
-            console.error("Error importing Firestore:", error);
             callback(false);
         });
 }
@@ -608,7 +565,6 @@ function scheduleInterview(jobUrl, dateAndTime, type, notes, callback) {
             const user = auth.currentUser;
 
             if (!user) {
-                console.error("User not authenticated");
                 callback(false);
                 return;
             }
@@ -641,16 +597,13 @@ function scheduleInterview(jobUrl, dateAndTime, type, notes, callback) {
             // Update the document in Firestore
             firestoreModule.updateDoc(vacancyRef, updateData)
                 .then(() => {
-                    console.log("Interview scheduled successfully");
                     callback(true);
                 })
                 .catch((error) => {
-                    console.error("Error scheduling interview:", error);
                     callback(false);
                 });
         })
         .catch((error) => {
-            console.error("Error importing Firestore:", error);
             callback(false);
         });
 }
@@ -667,7 +620,6 @@ function deleteMeeting(jobUrl, dateAndTime, callback) {
             const user = auth.currentUser;
 
             if (!user) {
-                console.error("User not authenticated");
                 callback(false);
                 return;
             }
@@ -707,17 +659,14 @@ function deleteMeeting(jobUrl, dateAndTime, callback) {
                     });
                 })
                 .then(() => {
-                    console.log("Meeting deleted successfully");
                     callback(true);
                 })
                 .catch((error) => {
-                    console.error("Error deleting meeting:", error);
                     callback(false);
                 });
 
         })
         .catch((error) => {
-            console.error("Error importing Firestore:", error);
             callback(false);
         });
 }
