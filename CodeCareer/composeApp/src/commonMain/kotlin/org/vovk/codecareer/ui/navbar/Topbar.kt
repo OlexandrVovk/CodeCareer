@@ -24,6 +24,7 @@ import com.seiko.imageloader.rememberImageSuccessPainter
 import com.seiko.imageloader.ui.AutoSizeBox
 import org.vovk.codecareer.dal.firebase.UserSessionManager
 import org.vovk.codecareer.dal.firebase.FirebaseManager
+import androidx.compose.foundation.BorderStroke
 
 /**
  * A Composable function for the top application bar of CodeCareer.
@@ -157,16 +158,28 @@ fun TopAppBar(
                         }
                     }
                 } else {
-                    // Login/Register buttons
+                    // Login/Register buttons with gray border and spacing
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = onNavigateToLogin) {
-                            Text("Login",
-                                color = Color(199, 194, 200),
-                                fontSize = 16.sp)
+                        OutlinedButton(
+                            onClick = onNavigateToLogin,
+                            border = BorderStroke(2.dp, Color(57,60,64,255)),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                backgroundColor = Color.Transparent,
+                            ),
+                            modifier = Modifier.height(36.dp)
+                        ) {
+                            Text("Login", fontSize = 16.sp, color = Color(199, 194, 200))
                         }
-                        IconButton(onClick = onNavigateToRegister) {
-                            Text("Register", color = Color(199, 194, 200),
-                                fontSize = 16.sp)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        OutlinedButton(
+                            onClick = onNavigateToRegister,
+                            border = BorderStroke(2.dp, Color(57,60,64,255)),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                backgroundColor = Color.Transparent,
+                            ),
+                            modifier = Modifier.height(36.dp)
+                        ) {
+                            Text("Register", fontSize = 16.sp, color = Color(199, 194, 200))
                         }
                     }
                 }
