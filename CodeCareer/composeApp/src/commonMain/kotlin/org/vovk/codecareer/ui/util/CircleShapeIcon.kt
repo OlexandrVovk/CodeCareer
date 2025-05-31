@@ -20,7 +20,7 @@ import com.seiko.imageloader.ui.AutoSizeBox
 
 @Composable
 fun CircleShapeIcon(companyUrl: String) {
-    val proxiedUrl = "http://localhost:9090/" + companyUrl
+    val proxiedUrl = "https://proxy.corsfix.com/?$companyUrl"
     Box(
         modifier = Modifier
             .size(24.dp)
