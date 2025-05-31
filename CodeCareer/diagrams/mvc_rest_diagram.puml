@@ -1,0 +1,34 @@
+@startuml MVC_REST
+
+' Збільшуємо відстані між вузлами по горизонталі та вертикалі
+skinparam nodesep 180
+skinparam ranksep 180
+
+' Ортогональні лінії для чіткого обходу блоків
+skinparam linetype ortho
+
+' Розташовуємо всі елементи зверху вниз
+top to bottom direction
+
+actor "Клієнт" as Client
+
+rectangle "Контролер\n(обробка запитів,\nмаршрутизація URL,\nкерування результатами)" as Controller
+
+rectangle "Модель\n(бізнес-логіка,\nвалідація даних,\nдоступ до БД)" as Model
+
+database "База даних" as DB
+
+rectangle "Вид\n(REST API відповідь\n(JSON/XML))" as View
+
+' Потоки даних і стрілки з текстом:
+Client --> Controller      : HTTP-запит\n(GET/POST/PUT/DELETE)
+
+Controller --> Model       : Виклик бізнес-логіки\n(операції CRUD)
+Model --> DB               : Доступ до БД\n(SQL-запити)
+DB --> Model               : Повернення даних\n(результати/помилки)
+Model --> Controller       : Повернення результатів операції
+
+Controller --> View        : Формування HTTP-відповіді\n(JSON/XML)
+View --> Client            : HTTP-відповідь
+
+@enduml
