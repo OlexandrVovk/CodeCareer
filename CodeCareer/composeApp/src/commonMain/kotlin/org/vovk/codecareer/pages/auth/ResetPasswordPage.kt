@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -56,17 +58,22 @@ class ResetPasswordPage : Screen {
             }
         }
 
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(15, 15, 17)),
             contentAlignment = Alignment.Center
         ) {
+            val isMobile = maxWidth < 425.dp
+            val scrollState = rememberScrollState()
+            val columnModifier = Modifier
+                .fillMaxWidth(if (isMobile) 1f else 0.5f)
+                .padding(horizontal = 24.dp)
+                .padding(top = 60.dp)
+                .let { if (isMobile) it.verticalScroll(scrollState) else it }
+
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 60.dp),
+                modifier = columnModifier,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
