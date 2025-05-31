@@ -49,8 +49,6 @@ fun TopAppBar(
     val currentUser     = UserSessionManager.currentUser
     val firebaseAuth    = remember { FirebaseManager() }
     val menuExpanded    = remember { mutableStateOf(false) }
-    // Avatar and menu sizing
-    val iconSize        = 36.dp
     val menuWidth       = 100.dp
 
     TopAppBar(
@@ -58,21 +56,49 @@ fun TopAppBar(
         backgroundColor = Color(15, 15, 17, 255),
         elevation = 0.dp
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val maxWidthDp = maxWidth
+            val smallScreen = maxWidthDp < 340.dp
+            val mediumScreen = maxWidthDp < 400.dp
+            // On mobile presets (S, M, L), hide the main title to save space
+            val isMobile = maxWidthDp < 425.dp
+            val spacerWidth = when {
+                smallScreen -> 16.dp
+                mediumScreen -> 24.dp
+                else -> 32.dp
+            }
+            val titleFontSize = when {
+                smallScreen -> 16.sp
+                mediumScreen -> 18.sp
+                else -> 20.sp
+            }
+            val tabFontSize = when {
+                smallScreen -> 14.sp
+                mediumScreen -> 15.sp
+                else -> 16.sp
+            }
+            val iconSize = when {
+                smallScreen -> 28.dp
+                mediumScreen -> 32.dp
+                else -> 36.dp
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "CodeCareer",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.width(32.dp))
+                if (!isMobile) {
+                    Text(
+                        text = "CodeCareer",
+                        fontSize = titleFontSize,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(spacerWidth))
+                }
                 TextButton(
                     onClick = onNavigateToJobs,
                     colors = ButtonDefaults.textButtonColors(
@@ -82,11 +108,11 @@ fun TopAppBar(
                     Text(
                         "Jobs",
                         fontWeight = if (isJobsActive) FontWeight.Bold else FontWeight.Normal,
-                        fontSize = 16.sp
+                        fontSize = tabFontSize
                     )
                 }
                 if (isLoggedIn) {
-                    Spacer(modifier = Modifier.width(32.dp))
+                    Spacer(modifier = Modifier.width(spacerWidth))
                     TextButton(
                         onClick = onNavigateToTracks,
                         colors = ButtonDefaults.textButtonColors(
@@ -96,7 +122,7 @@ fun TopAppBar(
                         Text(
                             "Tracks",
                             fontWeight = if (isJobsActive) FontWeight.Bold else FontWeight.Normal,
-                            fontSize = 16.sp
+                            fontSize = tabFontSize
                         )
                     }
                 }
@@ -185,5 +211,6 @@ fun TopAppBar(
                 }
             }
         }
+    }
     }
 }
