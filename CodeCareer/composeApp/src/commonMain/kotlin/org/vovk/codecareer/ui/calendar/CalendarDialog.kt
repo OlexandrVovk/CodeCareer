@@ -49,7 +49,10 @@ fun CalendarDialog(
     onDeleteMeetingsOnDate: (TrackedVacancy, String) -> Unit,
     onDismiss: () -> Unit
 ) {
+    // Get today's date from JS and parse minDate
     val todaysDate = getTodaysDate()
+    val partsMin = todaysDate.split("-").mapNotNull { it.toIntOrNull() }
+    val minDate = if (partsMin.size == 3) CalendarDate(partsMin[0], partsMin[1], partsMin[2]) else CalendarDate.now()
     val accentColor = Color(0xFF864AED)
     val errorColor = Color(0xFFE57373)
 
@@ -225,7 +228,8 @@ fun CalendarDialog(
                         onDeleteMeeting = { date ->
                             // Delete all meetings for this date at once
                             onDeleteMeetingsOnDate(vacancy, date)
-                        }
+                        },
+                        minDate = minDate
                     )
                 }
 

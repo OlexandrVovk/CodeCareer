@@ -38,7 +38,8 @@ fun DateSelectionStep(
     showPastDateError: Boolean,
     onDateSelected: (String) -> Unit,
     onCancel: () -> Unit,
-    onDeleteMeeting: (String) -> Unit
+    onDeleteMeeting: (String) -> Unit,
+    minDate: CalendarDate
 ) {
     var selectedDate by remember { mutableStateOf(currentDate)}
     Column(modifier = Modifier.padding(8.dp)) {
@@ -60,6 +61,7 @@ fun DateSelectionStep(
                 onDateSelected = { d -> selectedDate = d.format() },
                 accentColor = accentColor,
                 scheduledDates = scheduled,
+                minDate = minDate,
                 modifier = Modifier.fillMaxWidth()
             )
         }

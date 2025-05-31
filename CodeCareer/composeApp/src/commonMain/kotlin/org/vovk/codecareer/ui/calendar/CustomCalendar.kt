@@ -117,6 +117,7 @@ fun CustomCalendar(
     onDateSelected: (CalendarDate) -> Unit,
     accentColor: Color = Color(0xFF864AED),
     scheduledDates: List<String> = emptyList(),
+    minDate: CalendarDate? = null,
     modifier: Modifier = Modifier
 ) {
     // State for the currently displayed month and year
@@ -178,6 +179,7 @@ fun CustomCalendar(
             currentYear = currentYear,
             accentColor = accentColor,
             scheduledDates = scheduledDates,
+            minDate = minDate,
             onDateSelected = { date ->
                 selectedDate = date
                 onDateSelected(date)
@@ -252,6 +254,7 @@ private fun CalendarGrid(
     currentYear: Int,
     accentColor: Color,
     scheduledDates: List<String> = emptyList(),
+    minDate: CalendarDate? = null,
     onDateSelected: (CalendarDate) -> Unit
 ) {
     val prevMonth = CalendarMonth.previous(currentMonth)
@@ -266,22 +269,32 @@ private fun CalendarGrid(
                 for (column in 0 until 7) {
                     val linearIndex = row * 7 + column
                     val dayOffset = linearIndex + 1 - firstDayOfWeek
-
                     when {
                         dayOffset in 1..daysInMonth -> {
                             val date = CalendarDate(currentYear, currentMonth.number, dayOffset)
                             val dateStr = date.format()
                             val isDateScheduled = scheduledDates.contains(dateStr)
+                            val isActive = minDate?.let { min ->
+                                when {
+                                    date.year < min.year -> false
+                                    date.year > min.year -> true
+                                    date.month < min.month -> false
+                                    date.month > min.month -> true
+                                    date.day < min.day -> false
+                                    else -> true
+                                }
+                            } ?: true
                             DayCell(
                                 day = dayOffset,
                                 isSelected = date == selectedDate,
                                 isScheduled = isDateScheduled,
+                                isEnabled = isActive,
                                 accentColor = accentColor,
                                 modifier = Modifier
                                     .weight(1f)
                                     .aspectRatio(1f)
                                     .padding(2.dp),
-                                onClick = { onDateSelected(date) }
+                                onClick = { if (isActive) onDateSelected(date) }
                             )
                         }
                         dayOffset < 1 -> {
@@ -289,18 +302,27 @@ private fun CalendarGrid(
                             val prevDate = CalendarDate(prevYear, prevMonth.number, prevDay)
                             val prevDateStr = prevDate.format()
                             val isPrevDateScheduled = scheduledDates.contains(prevDateStr)
+                            val isActive = minDate?.let { min ->
+                                when {
+                                    prevDate.year < min.year -> false
+                                    prevDate.year > min.year -> true
+                                    prevDate.month < min.month -> false
+                                    prevDate.month > min.month -> true
+                                    prevDate.day < min.day -> false
+                                    else -> true
+                                }
+                            } ?: true
                             DayCell(
                                 day = prevDay,
                                 isSelected = false,
                                 isScheduled = isPrevDateScheduled,
+                                isEnabled = isActive,
                                 accentColor = Color.Gray,
                                 modifier = Modifier
                                     .weight(1f)
                                     .aspectRatio(1f)
                                     .padding(2.dp),
-                                onClick = {
-                                    onDateSelected(prevDate)
-                                }
+                                onClick = { if (isActive) onDateSelected(prevDate) }
                             )
                         }
 
@@ -338,6 +360,7 @@ private fun DayCell(
     day: Int,
     isSelected: Boolean,
     isScheduled: Boolean = false,
+    isEnabled: Boolean = true,
     accentColor: Color,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
@@ -367,12 +390,19 @@ private fun DayCell(
                 },
                 shape = RoundedCornerShape(4.dp)
             )
-            .clickable(onClick = onClick),
+            .then(
+                if (isEnabled) {
+                    Modifier.clickable(onClick = onClick)
+                } else {
+                    Modifier
+                }
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = day.toString(),
             color = when {
+                !isEnabled -> Color.Gray.copy(alpha = 0.5f) // Dimmed text for disabled dates
                 isSelected -> accentColor
                 isScheduled -> Color(0xFFB8860B) // Dark gold for scheduled dates text
                 else -> Color.Unspecified
