@@ -1,0 +1,29 @@
+@startuml FirebaseDBSchema
+           skinparam linetype ortho
+
+           entity "users" as users {
+             * uid : String
+             --
+             displayName : String?
+             email       : String?
+             photoURL    : String?
+           }
+
+           entity "trackedVacancies" as tv {
+             * jobUrl : String
+             --
+             status   : String
+             notes    : String
+             interviewSchedules : Array<Schedule>
+           }
+
+           entity "Schedule" as sched {
+             date : String
+             time : String
+             type : String
+             notes: String
+           }
+
+           users ||--o{ tv : has
+           tv }|..|{ sched : contains
+@enduml

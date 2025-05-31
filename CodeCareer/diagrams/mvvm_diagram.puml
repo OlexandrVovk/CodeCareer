@@ -1,0 +1,55 @@
+@startuml MVVM_Pattern
+skinparam componentStyle rectangle
+
+package "View (UI Pages)" {
+  [LoginPage]
+  [RegisterPage]
+  [ResetPasswordPage]
+  [JobSearchPage]
+  [TracksPage]
+}
+
+package "ViewModel (State & Logic)" {
+  [FirebaseManager]
+  [FilterStateManager]
+  [VacanciesEntityManager]
+  [UserSessionManager]
+}
+
+package "Model (Data & Entities)" {
+  [JobCartEntity]
+  [TrackedVacancy]
+  [InterviewSchedule]
+  [FilterDataEntity]
+  [UserData]
+  [VacanciesObject]
+}
+
+actor User
+
+User --> LoginPage : interacts
+LoginPage --> FirebaseManager : signInWithEmail(), loginWithGoogle()
+RegisterPage --> FirebaseManager : registerWithEmail()
+ResetPasswordPage --> FirebaseManager : resetPassword()
+JobSearchPage --> FilterStateManager : applyFilters()
+JobSearchPage --> VacanciesEntityManager : getVacancies(), parseJsonToJobCartEntityList()
+TracksPage --> FirebaseManager : toGetTrackedVacancies(), toAddNewVacancyTrack(), toUpdateTrackedVacancy(), scheduleInterview(), deleteMeeting()
+TracksPage --> VacanciesEntityManager : getVacancies()
+
+FirebaseManager --> UserSessionManager : saveUserSession(), loadUserFromStorage(), clearUserSession()
+FilterStateManager --> FilterDataEntity : getFilterDataEntity()
+VacanciesEntityManager --> JobCartEntity : maps raw JSON to entities
+VacanciesEntityManager --> VacanciesObject : reads vacanciesString
+
+FirebaseManager --> TrackedVacancy       : toGetTrackedVacancies() returns List<TrackedVacancy>
+FirebaseManager --> InterviewSchedule    : parses interviewSchedules field into model
+UserSessionManager --> UserData         : manages currentUser session data
+
+database FirestoreDB
+actor "Firebase Auth" as AuthService
+
+FirebaseManager --> AuthService : auth API calls
+FirebaseManager --> FirestoreDB : CRUD operations
+FilterStateManager --> FirestoreDB : backend request via sendRequest()
+
+@enduml

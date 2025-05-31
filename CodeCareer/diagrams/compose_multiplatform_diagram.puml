@@ -1,0 +1,41 @@
+@startuml Compose_Multiplatform
+skinparam rectangle {
+  Shadowing false
+  roundCorner 15
+}
+
+title Compose Multiplatform Architecture
+
+actor Developer as Dev
+
+rectangle "Shared UI Module\n(Common Module)" as Shared {
+  [@Composable functions\n(UI code)] as SharedUI
+}
+
+Dev --> SharedUI : writes UI logic
+
+rectangle "Platform Targets" {
+  [Android App\n(Compose for Android)] as Android
+  [Web App\n(Compose for Web/WASM)] as Web
+  [Desktop App\n(Compose for Desktop)] as Desktop
+  [iOS App\n(Compose for iOS)]       as iOS
+}
+
+SharedUI --> Android : compiled to JVM bytecode
+SharedUI --> Web     : compiled to JS/WASM
+SharedUI --> Desktop : compiled to JVM bytecode
+SharedUI --> iOS     : compiled to native
+
+rectangle "Platform Runtimes" {
+  [Android UI Toolkit\n(Material Components)] as AUI
+  [Browser DOM/Canvas]                   as WDOM
+  [Skia Graphics Library]                as SGL
+  [UIKit Framework]                      as UIKIT
+}
+
+Android --> AUI
+Web     --> WDOM
+Desktop --> SGL
+iOS     --> UIKIT
+
+@enduml

@@ -7,5 +7,5 @@ import org.jsoup.nodes.Document;
 import java.util.List;
 
 public interface Parser {
-    public List<ResponseDto> getVacancies(VacancyRequest vacancyRequest);
+    List<ResponseDto> getVacancies(VacancyRequest vacancyRequest);
 }

@@ -1,0 +1,15 @@
+    @startuml LoginSequence
+    actor User
+    participant "LoginPage"      as LP
+    participant "FirebaseManager" as FM
+    participant "Firebase Auth"   as FA
+    participant "UserSessionManager" as USM
+
+    User -> LP : натискає Sign In
+    LP -> FM : signInWithEmail(email, password, callback)
+    FM -> FA : Auth.signIn(email, password)
+    FA --> FM : response JSON { success, uid, … }
+    FM -> USM : saveUserSession(response)
+    FM --> LP : callback(success = true)
+    LP --> User : навігація на головний екран
+    @enduml
